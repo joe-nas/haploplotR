@@ -1,0 +1,30 @@
+---
+title: "haploplotR example"
+author: "Jonas Falck"
+date: "November 5, 2015"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, background=T, include=FALSE}
+library(devtools)
+library(WhopGenome)
+library(GenomicRanges)
+library(TxDb.Hsapiens.UCSC.hg19.knownGene)
+devtools::load_all('../haploplotR')
+```
+
+
+Setting up the target region we want to plot.
+```{r}
+target_gr <- GRanges(Rle('chr1'), IRanges(start = 209769729, end = 209789729))
+vcffile <- "ALL.%s.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz"
+panelfile <- "integrated_call_samples_v3.20130502.ALL.panel"
+
+
+target_data <- get_SnpMatrix_from_vcf(where = target_gr, which = "CEU", vcf_file = vcffile, panel_file = panelfile)[[2]]
+#rsquared_ceu <- snpStats::ld(target_data$genotype, target_data$genotype, stats = 'R.squared')
+```

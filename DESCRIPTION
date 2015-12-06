@@ -1,0 +1,19 @@
+Package: haploplotR
+Type: Package
+Title: Visualize pairwise SNP statistics
+Version: 0.1.0
+Author: Jonas Falck
+Maintainer: Jonas Falck <jonas.falck@student.ru.nl>
+Description: Fetch 1000 Genomes phased haplotype data and visualize it.
+License: What license is it under?
+LazyData: TRUE
+Imports:
+    Rcpp (>= 0.12.1),
+    WhopGenome,
+    GenomicRanges,
+    grid,
+    snpStats,
+    biovizBase,
+    Homo.sapiens
+LinkingTo: Rcpp
+RoxygenNote: 5.0.0
