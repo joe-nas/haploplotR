@@ -3,7 +3,7 @@ library(GenomicRanges)
 library(grid)
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 library(Homo.sapiens)
-devtools::load_all('/home/jonas/R/haploplotR/')
+devtools::load_all('/home/SSD-Data/Projects/haploplotR/')
 
 
 # library(org.Hs.eg.db)
@@ -15,7 +15,7 @@ devtools::load_all('/home/jonas/R/haploplotR/')
 
 
 target_gr <- GRanges(Rle('chr1'), IRanges(start = 209789729, end = 210189729))
-vcffile <- "ALL.%s.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz"
+vcffile <- "/home/SSD-Data/1000Genomes/ALL.%s.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz"
 panelfile <- "integrated_call_samples_v3.20130502.ALL.panel"
 
 
@@ -104,15 +104,15 @@ head(target_data$info)
 
 
 ## --------- Analysis ---------
-library(SNPlocs.Hsapiens.dbSNP142.GRCh37)
+library(SNPlocs.Hsapiens.dbSNP144.GRCh37)
 library(plyr)
 library(doMC)
 registerDoMC(2)
 
 
 lead_snps <- read.table("~/../Storage/Documents/p63_latex/section_results/tables/lead_snps.csv",sep = ',', header = T, stringsAsFactors = F)
-lead_snps <- snpsById(SNPlocs.Hsapiens.dbSNP142.GRCh37, lead_snps$lead.SNPs)
-
+lead_snps <- snpsById(SNPlocs.Hsapiens.dbSNP144.GRCh37, lead_snps$lead.SNPs)
+lead_snps <- GRanges(lead_snps)
 
 lead_snps_res <- resize(lead_snps, fix = 'center', width = 4e5)
 lead_snps_red <- reduce(lead_snps_res)
@@ -123,7 +123,7 @@ genome(lead_snps_red) <- NA
 genome(lead_snps) <- NA
 
 
-setwd("~/../Storage/Downloads/1000G/")
+setwd("/home/SSD-Data/1000Genomes/")
 
 haploplot <- function(where, leads){
   where <- GRanges(Rle(as.character(seqnames(where))), IRanges(start(where), end(where)))
