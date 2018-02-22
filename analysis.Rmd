@@ -42,14 +42,11 @@ Given lead_snps_gr and analysis_intervals_gr we can now import 1000Genomes haplo
 devtools::load_all('/home/SSD-Data/Projects/haploplotR/')
 
 TGData <- llply(analysis_intervals_gr, function(x){
-  list(gr = x, data = import1000GData(where = x, which = populations, vcf_file = vcffile, panel_file = panelfile))}
-  , .parallel = TRUE)
-
-llply(TGData, function(x){
-  x$ld <- llply(x$data, function(x) calculateLD(lead_snps,x$genotype))
-}, parallel = TRUE)
-
-
+  gr <- x # location where rsuared is calculated
+  data <- import1000GData(where = x, which = populations, vcf_file = vcffile, panel_file = panelfile) # 1000G data
+  rsquared <- llply(data, function(dat) calculateLD(lead_snps,dat$genotype)) # rs for given population and lead_snps
+  list(gr = gr, data = data, rsquared = rsquared) # return all the data as list
+}, .parallel = TRUE)
 
 ```
 
