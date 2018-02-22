@@ -23,8 +23,3 @@ calculateLD <- function(lead_snps, xSnpMatrix, ...){
 
 #  }
 }
-
-my_mapping <- Reduce(rbind,lapply(seq_along(target_dat), function(i){
-  prepareMapping(r2 = target_rsquared[[i]],mapping =  target_dat[[i]]$info,r2_cutoff = 0.8,
-                 lead = c('rs10863790','rs10863790','rs11119348', 'rs12566152','rs861020','rs10863790'))
-}))
