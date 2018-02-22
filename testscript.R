@@ -114,7 +114,7 @@ lead_snps <- read.table("~/../Storage/Documents/p63_latex/section_results/tables
 lead_snps <- snpsById(SNPlocs.Hsapiens.dbSNP144.GRCh37, lead_snps$lead.SNPs)
 lead_snps <- GRanges(lead_snps)
 
-lead_snps_res <- resize(lead_snps, fix = 'center', width = 4e5)
+lead_snps_res <- resize(lead_snps,
 lead_snps_red <- reduce(lead_snps_res)
 lead_snps_red <- resize(lead_snps_red, fix = 'center', width = 4e5)
 seqlevelsStyle(lead_snps_red) <- "UCSC"
@@ -587,3 +587,12 @@ res <- collapseTranscriptsBy(mytxs, "gene_id")
 
 
 Reduce(unlist,res)
+
+
+
+## as input: analysis_interval_gr, populations, lead_snps
+## as output:
+
+
+
+

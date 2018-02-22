@@ -1,0 +1,62 @@
+---
+title: "Analysis Approach 1"
+output:
+  html_document:
+    df_print: paged
+  html_notebook: default
+  pdf_document: default
+---
+
+Setting up the analysis dependencies are loaded and SNP and populations to be analysed are defined. Furthermore, paths to 1000Genomes vcf and tbi files are set, as well as to the panel file.
+
+
+```{r Setting up the environment, echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
+library(devtools)
+library(GenomicRanges)
+library(grid)
+library(TxDb.Hsapiens.UCSC.hg19.knownGene)
+library(SNPlocs.Hsapiens.dbSNP144.GRCh37)
+library(Homo.sapiens)
+
+lead_snps <- c("rs12569773", "rs4615961", "rs10983654", "rs1512262", "rs11119348" )
+populations <- c('CEU', 'CHB', 'YRI')
+
+vcffile <- "/home/SSD-Data/1000Genomes/ALL.%s.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz"
+panelfile <- "/home/SSD-Data/1000Genomes/integrated_call_samples_v3.20130502.ALL.panel"
+```
+
+Next information about SNPs is gathered from dbSNP144 and stored as lead_snps_gr. Then, 650Kb intervals are created around the lead_SNPs_gr creating analysis_intervals_gr. Furthermore, both objects are modified to have a common format corresponding to UCSC standart.
+
+```{r}
+lead_snps_gr <- GRanges(snpsById(SNPlocs.Hsapiens.dbSNP144.GRCh37, lead_snps))
+analysis_intervals_gr <- resize(lead_snps_gr, fix = 'center', width = 6.5e5)
+seqlevelsStyle(lead_snps_gr) <- "UCSC"
+seqlevelsStyle(analysis_intervals_gr) <- "UCSC"
+genome(lead_snps_gr) <- NA
+genome(analysis_intervals_gr) <- NA
+```
+
+Given lead_snps_gr and analysis_intervals_gr we can now import 1000Genomes haplotype data to calculate linkage disequilibrium from lead-SNPs to the 1000Genomes variants. Here we use the haploplotR package to import 1000Genomes data and calculate R^2 values for lead_snps and populations.
+
+```{r}
+devtools::load_all('/home/SSD-Data/Projects/haploplotR/')
+
+TGData <- llply(analysis_intervals_gr, function(x){
+  list(gr = x, data = import1000GData(where = x, which = populations, vcf_file = vcffile, panel_file = panelfile))}
+  , .parallel = TRUE)
+
+llply(TGData, function(x){
+  x$ld <- llply(x$data, function(x) calculateLD(lead_snps,x$genotype))
+}, parallel = TRUE)
+
+
+
+```
+
+
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
