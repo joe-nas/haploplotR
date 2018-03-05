@@ -6,20 +6,20 @@
 identifyHighLD <- function(rsquared, info, cutoff = 0.8){
   #identify tag-SNPs
   res <- which(rsquared >= cutoff, arr.ind = T) # rownames: all SNPs in ranges, colnames lead-SNPS
-  res_info_df <- data.frame(info[res[,1],],rsquared = rsquared[res])
+  lead_snps_v <- colnames(rsquared)[res[,2]] # lead_snp vector
+  res_info_df <- data.frame(lead_snp = lead_snps_v, info[res[,1],], rsquared = rsquared[res])
   chromosomes <- Rle(paste("chr",res_info_df$chromosome_num, sep=""))
-  startP <-info[as.numeric(rownames(res_info_df))-1,]$pos
-  endP <- info[as.numeric(rownames(res_info_df))+1,]$pos
-  tag_snps <- GRanges(chromosomes,IRanges(star = startP, end = endP), mcols = res_info_df)
+  tag_snp_r <- as.numeric(rownames(res_info_df))
+  startP <-info[tag_snp_r-1,]$pos
+  endP <- info[tag_snp_r+1,]$pos
+  tag_snps <- GRanges(chromosomes, IRanges(star = startP, end = endP),
+                      mcols = data.frame(lead_pos = res_info_df$pos, lead_snp = res_info_df$lead_snp,
+                                         tag_snp = res_info_df$ids, rs = res_info_df$rsquared))
   tag_snps
 }
 
-constructTagSNPIntervals <-function(res_info){
-  tag_SNP_rowpos <- as.integer(rownames(res_info))
 
-}
-
-  #identifyHighLD(TGData[[3]]$rsquared$CEU, TGData[[3]]$data$CEU$info )
+#identifyHighLD(TGData[[3]]$rsquared$CEU, TGData[[3]]$data$CEU$info )
 
 # tagSNPintervals <- function(){
 #
