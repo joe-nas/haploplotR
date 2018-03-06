@@ -13,13 +13,13 @@ Setting up the analysis dependencies are loaded and SNP and populations to be an
 ```{r Setting up the environment, echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
 library(devtools)
 library(GenomicRanges)
-library(grid)
+library(grid)using
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 library(SNPlocs.Hsapiens.dbSNP144.GRCh37)
 library(Homo.sapiens)
 
 
-lead_snps <- read.table("~/../Storage/Documents/Thesis1/section_results/tables/lead_snps.csv", header = T, stringsAsFactors = F)$lead.SNPs
+lead_snps <- read.table("~/../Storage/Documents/Thesis1/section_results/tables/lead_snps.csv", header = T, stringsAsFactors = F)$lead.SNPs[1:5]
 populations <- read.table("~/../Storage/Documents/Thesis1/section_appendix/tables/1000Genomes_populations.csv", header = T, stringsAsFactors = F, sep = ",")$Code
 
 vcffile <- "/home/SSD-Data/1000Genomes/ALL.%s.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz"
@@ -37,9 +37,9 @@ genome(lead_snps_gr) <- NA
 genome(analysis_intervals_gr) <- NA
 ```
 
-Given lead_snps_gr and analysis_intervals_gr we can now import 1000Genomes haplotype data to calculate linkage disequilibrium from lead-SNPs to the 1000Genomes variants. Here we use the haploplotR package to import 1000Genomes data and calculate R^2 values for lead_snps and populations.
+Given lead_snps_gr and analysis_intervals_gr we can now import 1000Genomes haplotype data to calculate linkage disequilibrium from lead-SNPs to the 1000Genomes variants. Here we use the haploplotR package to import 1000Genomes for data.
 
-```{r}
+```{r Import data}
 devtools::load_all('/home/SSD-Data/Projects/haploplotR/')
 registerDoMC(cores = 2)
 TGData <- llply(analysis_intervals_gr, function(x){
@@ -50,11 +50,18 @@ TGData <- llply(analysis_intervals_gr, function(x){
 }, .parallel = TRUE)
 
 ```
+Given the imported data we can now use the identifyHighLD function to find SNPs in high LD (R^2) with the lead-SNPs and to identify tag-SNP intervals.
 
+```{R Compute R^2 and find tag-SNP intervals}
 
+results <- llply(TGData, function(x){ ## loop over the imported 1000G data
+  Reduce(c,llply(populations, function(y){ ## loop over populations, calculate LD etc and generate results.
+    identifyHighLD(rsquared = x$rsquared[[y]], x$data[[y]]$info, population = y)
+  }))
+})
 
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+names(results) <- Reduce(c,Map(function(x) paste(x$gr,x$gr$RefSNP_id, sep = "_"), TGData))
 
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+head(results)
+```
 
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.

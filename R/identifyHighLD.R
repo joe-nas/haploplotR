@@ -3,7 +3,7 @@
 
 
 
-identifyHighLD <- function(rsquared, info, cutoff = 0.8){
+identifyHighLD <- function(rsquared, info, cutoff = 0.8, population = NULL){
   #identify tag-SNPs
   res <- which(rsquared >= cutoff, arr.ind = T) # rownames: all SNPs in ranges, colnames lead-SNPS
   lead_snps_v <- colnames(rsquared)[res[,2]] # lead_snp vector
@@ -15,7 +15,7 @@ identifyHighLD <- function(rsquared, info, cutoff = 0.8){
   # results
   tag_snps <- GRanges(chromosomes, IRanges(star = startP, end = endP),
                       mcols = data.frame(lead_pos = res_info_df$pos, lead_snp = res_info_df$lead_snp,
-                                         tag_snp = res_info_df$ids, rs = res_info_df$rsquared))
+                                         tag_snp = res_info_df$ids, rs = res_info_df$rsquared, population = population))
   tag_snps
 }
 
