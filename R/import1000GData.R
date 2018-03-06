@@ -25,7 +25,7 @@ import1000GData <- function(where, which, vcf_file, panel_file){
 
     which <- x$sample
 
-    print(which)
+    #print(x)
 
     WhopGenome::vcf_selectsamples(vcf_handle, which)
 
