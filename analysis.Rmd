@@ -18,8 +18,9 @@ library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 library(SNPlocs.Hsapiens.dbSNP144.GRCh37)
 library(Homo.sapiens)
 
-lead_snps <- c("rs12569773", "rs4615961", "rs10983654", "rs1512262", "rs11119348" )
-populations <- c('CEU', 'CHB', 'YRI')
+
+lead_snps <- read.table("~/../Storage/Documents/Thesis1/section_results/tables/lead_snps.csv", header = T, stringsAsFactors = F)$lead.SNPs
+populations <- read.table("~/../Storage/Documents/Thesis1/section_appendix/tables/1000Genomes_populations.csv", header = T, stringsAsFactors = F, sep = ",")$Code
 
 vcffile <- "/home/SSD-Data/1000Genomes/ALL.%s.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz"
 panelfile <- "/home/SSD-Data/1000Genomes/integrated_call_samples_v3.20130502.ALL.panel"
@@ -40,7 +41,7 @@ Given lead_snps_gr and analysis_intervals_gr we can now import 1000Genomes haplo
 
 ```{r}
 devtools::load_all('/home/SSD-Data/Projects/haploplotR/')
-
+registerDoMC(cores = 2)
 TGData <- llply(analysis_intervals_gr, function(x){
   gr <- x # location where rsuared is calculated
   data <- import1000GData(where = x, which = populations, vcf_file = vcffile, panel_file = panelfile) # 1000G data
