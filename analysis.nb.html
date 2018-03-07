@@ -176,13 +176,14 @@ $(document).ready(function () {
 <p>Setting up the analysis dependencies are loaded and SNP and populations to be analysed are defined. Furthermore, paths to 1000Genomes vcf and tbi files are set, as well as to the panel file.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucG9wdWxhdGlvbnMgPC0gcmVhZC50YWJsZShcIn4vLi4vU3RvcmFnZS9Eb2N1bWVudHMvVGhlc2lzMS9zZWN0aW9uX2FwcGVuZGl4L3RhYmxlcy8xMDAwR2Vub21lc19wb3B1bGF0aW9ucy5jc3ZcIiwgc3RyaW5nc0FzRmFjdG9ycyA9IEYpXG5cbmBgYCJ9 -->
-<pre class="r"><code>populations &lt;- read.table(&quot;~/../Storage/Documents/Thesis1/section_appendix/tables/1000Genomes_populations.csv&quot;, stringsAsFactors = F)
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShkZXZ0b29scylcbmxpYnJhcnkoR2Vub21pY1JhbmdlcylcbmxpYnJhcnkoZ3JpZCl1c2luZ1xuXG5gYGAifQ== -->
+<pre class="r"><code>library(devtools)
+library(GenomicRanges)
+library(grid)using
 </code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiRXJyb3IgaW4gc2NhbihmaWxlID0gZmlsZSwgd2hhdCA9IHdoYXQsIHNlcCA9IHNlcCwgcXVvdGUgPSBxdW90ZSwgZGVjID0gZGVjLCAgOiBcbiAgbGluZSAxIGRpZCBub3QgaGF2ZSA3IGVsZW1lbnRzXG4ifQ== -->
-<pre><code>Error in scan(file = file, what = what, sep = sep, quote = quote, dec = dec,  : 
-  line 1 did not have 7 elements</code></pre>
+<!-- rnb-output-begin eyJkYXRhIjoiRXJyb3I6IHVuZXhwZWN0ZWQgc3ltYm9sIGluIFwibGlicmFyeShncmlkKXVzaW5nXCJcbiJ9 -->
+<pre><code>Error: unexpected symbol in &quot;library(grid)using&quot;</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -198,29 +199,221 @@ $(document).ready(function () {
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>Given lead_snps_gr and analysis_intervals_gr we can now import 1000Genomes haplotype data to calculate linkage disequilibrium from lead-SNPs to the 1000Genomes variants. Here we use the haploplotR package to import 1000Genomes data and calculate R^2 values for lead_snps and populations.</p>
+<p>Given lead_snps_gr and analysis_intervals_gr we can now import 1000Genomes haplotype data to calculate linkage disequilibrium from lead-SNPs to the 1000Genomes variants. Here we use the haploplotR package to import 1000Genomes for data.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuVEdEYXRhIDwtIGxscGx5KGFuYWx5c2lzX2ludGVydmFsc19nciwgZnVuY3Rpb24oeCl7XG4gIGdyIDwtIHggIyBsb2NhdGlvbiB3aGVyZSByc3VhcmVkIGlzIGNhbGN1bGF0ZWRcbiAgZGF0YSA8LSBpbXBvcnQxMDAwR0RhdGEod2hlcmUgPSB4LCB3aGljaCA9IHBvcHVsYXRpb25zLCB2Y2ZfZmlsZSA9IHZjZmZpbGUsIHBhbmVsX2ZpbGUgPSBwYW5lbGZpbGUpICMgMTAwMEcgZGF0YVxuICByc3F1YXJlZCA8LSBsbHBseShkYXRhLCBmdW5jdGlvbihkYXQpIGNhbGN1bGF0ZUxEKGxlYWRfc25wcyxkYXQkZ2Vub3R5cGUpKSAjIHJzIGZvciBnaXZlbiBwb3B1bGF0aW9uIGFuZCBsZWFkX3NucHNcbiAgbGlzdChnciA9IGdyLCBkYXRhID0gZGF0YSwgcnNxdWFyZWQgPSByc3F1YXJlZCkgIyByZXR1cm4gYWxsIHRoZSBkYXRhIGFzIGxpc3Rcbn0sIC5wYXJhbGxlbCA9IFRSVUUpXG5cbmBgYCJ9 -->
-<pre class="r"><code>TGData &lt;- llply(analysis_intervals_gr, function(x){
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGV2dG9vbHM6OmxvYWRfYWxsKCcvaG9tZS9TU0QtRGF0YS9Qcm9qZWN0cy9oYXBsb3Bsb3RSLycpXG5cbmBgYCJ9 -->
+<pre class="r"><code>devtools::load_all('/home/SSD-Data/Projects/haploplotR/')
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiTG9hZGluZyBoYXBsb3Bsb3RSXG4ifQ== -->
+<pre><code>Loading haploplotR</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucmVnaXN0ZXJEb01DKGNvcmVzID0gMilcblRHRGF0YSA8LSBsbHBseShhbmFseXNpc19pbnRlcnZhbHNfZ3IsIGZ1bmN0aW9uKHgpe1xuICBnciA8LSB4ICMgbG9jYXRpb24gd2hlcmUgcnN1YXJlZCBpcyBjYWxjdWxhdGVkXG4gIGRhdGEgPC0gaW1wb3J0MTAwMEdEYXRhKHdoZXJlID0geCwgd2hpY2ggPSBwb3B1bGF0aW9ucywgdmNmX2ZpbGUgPSB2Y2ZmaWxlLCBwYW5lbF9maWxlID0gcGFuZWxmaWxlKSAjIDEwMDBHIGRhdGFcbiAgcnNxdWFyZWQgPC0gbGxwbHkoZGF0YSwgZnVuY3Rpb24oZGF0KSBjYWxjdWxhdGVMRChsZWFkX3NucHMsZGF0JGdlbm90eXBlKSkgIyBycyBmb3IgZ2l2ZW4gcG9wdWxhdGlvbiBhbmQgbGVhZF9zbnBzXG4gIGxpc3QoZ3IgPSBnciwgZGF0YSA9IGRhdGEsIHJzcXVhcmVkID0gcnNxdWFyZWQpICMgcmV0dXJuIGFsbCB0aGUgZGF0YSBhcyBsaXN0XG59LCAucGFyYWxsZWwgPSBUUlVFKVxuYGBgIn0= -->
+<pre class="r"><code>registerDoMC(cores = 2)
+TGData &lt;- llply(analysis_intervals_gr, function(x){
   gr &lt;- x # location where rsuared is calculated
   data &lt;- import1000GData(where = x, which = populations, vcf_file = vcffile, panel_file = panelfile) # 1000G data
   rsquared &lt;- llply(data, function(dat) calculateLD(lead_snps,dat$genotype)) # rs for given population and lead_snps
   list(gr = gr, data = data, rsquared = rsquared) # return all the data as list
-}, .parallel = TRUE)
-</code></pre>
+}, .parallel = TRUE)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiMDYgTWFyIDIwMTggMTM6NDM6MzkgW3JzZXNzaW9uLWpvbmFzXSBXQVJOSU5HIEFib3J0IHJlcXVlc3RlZDsgTE9HR0VEIEZST006IGJvb2wgcnN0dWRpbzo6c2Vzc2lvbjo6Y29ubmVjdGlvbjo6Y2hlY2tGb3JBYm9ydChyc3R1ZGlvX2Jvb3N0OjpzaGFyZWRfcHRyPHJzdHVkaW86OnNlc3Npb246Okh0dHBDb25uZWN0aW9uPiwgcnN0dWRpb19ib29zdDo6ZnVuY3Rpb248dm9pZCgpPikgL2hvbWUvdWJ1bnR1L3JzdHVkaW8vc3JjL2NwcC9zZXNzaW9uL2h0dHAvU2Vzc2lvbkh0dHBDb25uZWN0aW9uVXRpbHMuY3BwOjEzN1xuIn0= -->
-<pre><code>06 Mar 2018 13:43:39 [rsession-jonas] WARNING Abort requested; LOGGED FROM: bool rstudio::session::connection::checkForAbort(rstudio_boost::shared_ptr&lt;rstudio::session::HttpConnection&gt;, rstudio_boost::function&lt;void()&gt;) /home/ubuntu/rstudio/src/cpp/session/http/SessionHttpConnectionUtils.cpp:137</code></pre>
+<!-- rnb-output-begin eyJkYXRhIjoiKElJKSBWQ0YgdmVyc2lvbiBpcyA0LjFcbihJSSkgVkNGIEZpbGUgY29udGFpbnMgMjUwNCBzYW1wbGVzXG5bMV0gXCI4OjEyOTU1Nzg0My0xMzAyMDc4NDJcIlxuY2w9MFxuKCEhKSB3aG9wX3RhYml4OjpnZXRGaWVsZFB0ciA6IGRpZCBub3QgcmVhZCBhIGxpbmUgb2YgZGF0YSBmcm9tIHRoZSBUYWJpeC1maWxlIHlldCFcbighISkgd2hvcF90YWJpeDo6Z2V0RmllbGRQdHIgOiBkaWQgbm90IHJlYWQgYSBsaW5lIG9mIGRhdGEgZnJvbSB0aGUgVGFiaXgtZmlsZSB5ZXQhXG4ifQ== -->
+<pre><code>(II) VCF version is 4.1
+(II) VCF File contains 2504 samples
+[1] &quot;8:129557843-130207842&quot;
+cl=0
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiTG9hZGluZyByZXF1aXJlZCBwYWNrYWdlOiBzbnBTdGF0c1xuTG9hZGluZyByZXF1aXJlZCBwYWNrYWdlOiBzdXJ2aXZhbFxuTG9hZGluZyByZXF1aXJlZCBwYWNrYWdlOiBNYXRyaXhcblxuQXR0YWNoaW5nIHBhY2thZ2U6ICdNYXRyaXgnXG5cblRoZSBmb2xsb3dpbmcgb2JqZWN0IGlzIG1hc2tlZCBmcm9tICdwYWNrYWdlOlM0VmVjdG9ycyc6XG5cbiAgICBleHBhbmRcbiJ9 -->
+<pre><code>Loading required package: snpStats
+Loading required package: survival
+Loading required package: Matrix
+
+Attaching package: 'Matrix'
+
+The following object is masked from 'package:S4Vectors':
+
+    expand</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiKElJKSBWQ0YgdmVyc2lvbiBpcyA0LjFcbihJSSkgVkNGIEZpbGUgY29udGFpbnMgMjUwNCBzYW1wbGVzXG5bMV0gXCI4OjEyOTU1Nzg0My0xMzAyMDc4NDJcIlxuY2w9MFxuKCEhKSB3aG9wX3RhYml4OjpnZXRGaWVsZFB0ciA6IGRpZCBub3QgcmVhZCBhIGxpbmUgb2YgZGF0YSBmcm9tIHRoZSBUYWJpeC1maWxlIHlldCFcbighISkgd2hvcF90YWJpeDo6Z2V0RmllbGRQdHIgOiBkaWQgbm90IHJlYWQgYSBsaW5lIG9mIGRhdGEgZnJvbSB0aGUgVGFiaXgtZmlsZSB5ZXQhXG4oSUkpIFZDRiB2ZXJzaW9uIGlzIDQuMVxuKElJKSBWQ0YgRmlsZSBjb250YWlucyAyNTA0IHNhbXBsZXNcblsxXSBcIjg6MTI5NTU3ODQzLTEzMDIwNzg0MlwiXG5jbD0wXG4oISEpIHdob3BfdGFiaXg6OmdldEZpZWxkUHRyIDogZGlkIG5vdCByZWFkIGEgbGluZSBvZiBkYXRhIGZyb20gdGhlIFRhYml4LWZpbGUgeWV0IVxuKCEhKSB3aG9wX3RhYml4OjpnZXRGaWVsZFB0ciA6IGRpZCBub3QgcmVhZCBhIGxpbmUgb2YgZGF0YSBmcm9tIHRoZSBUYWJpeC1maWxlIHlldCFcbihJSSkgVkNGIHZlcnNpb24gaXMgNC4xXG4oSUkpIFZDRiBGaWxlIGNvbnRhaW5zIDI1MDQgc2FtcGxlc1xuWzFdIFwiODoxMjk1NTc4NDMtMTMwMjA3ODQyXCJcbmNsPTBcbighISkgd2hvcF90YWJpeDo6Z2V0RmllbGRQdHIgOiBkaWQgbm90IHJlYWQgYSBsaW5lIG9mIGRhdGEgZnJvbSB0aGUgVGFiaXgtZmlsZSB5ZXQhXG4oISEpIHdob3BfdGFiaXg6OmdldEZpZWxkUHRyIDogZGlkIG5vdCByZWFkIGEgbGluZSBvZiBkYXRhIGZyb20gdGhlIFRhYml4LWZpbGUgeWV0IVxuKElJKSBWQ0YgdmVyc2lvbiBpcyA0LjFcbihJSSkgVkNGIEZpbGUgY29udGFpbnMgMjUwNCBzYW1wbGVzXG5bMV0gXCI4OjEyOTU1Nzg0My0xMzAyMDc4NDJcIlxuY2w9MFxuKCEhKSB3aG9wX3RhYml4OjpnZXRGaWVsZFB0ciA6IGRpZCBub3QgcmVhZCBhIGxpbmUgb2YgZGF0YSBmcm9tIHRoZSBUYWJpeC1maWxlIHlldCFcbighISkgd2hvcF90YWJpeDo6Z2V0RmllbGRQdHIgOiBkaWQgbm90IHJlYWQgYSBsaW5lIG9mIGRhdGEgZnJvbSB0aGUgVGFiaXgtZmlsZSB5ZXQhXG4oSUkpIFZDRiB2ZXJzaW9uIGlzIDQuMVxuKElJKSBWQ0YgRmlsZSBjb250YWlucyAyNTA0IHNhbXBsZXNcblsxXSBcIjg6MTI5NTU3ODQzLTEzMDIwNzg0MlwiXG5jbD0wXG4oISEpIHdob3BfdGFiaXg6OmdldEZpZWxkUHRyIDogZGlkIG5vdCByZWFkIGEgbGluZSBvZiBkYXRhIGZyb20gdGhlIFRhYml4LWZpbGUgeWV0IVxuKCEhKSB3aG9wX3RhYml4OjpnZXRGaWVsZFB0ciA6IGRpZCBub3QgcmVhZCBhIGxpbmUgb2YgZGF0YSBmcm9tIHRoZSBUYWJpeC1maWxlIHlldCFcbihJSSkgVkNGIHZlcnNpb24gaXMgNC4xXG4oSUkpIFZDRiBGaWxlIGNvbnRhaW5zIDI1MDQgc2FtcGxlc1xuWzFdIFwiODoxMjk1NTc4NDMtMTMwMjA3ODQyXCJcbmNsPTBcbighISkgd2hvcF90YWJpeDo6Z2V0RmllbGRQdHIgOiBkaWQgbm90IHJlYWQgYSBsaW5lIG9mIGRhdGEgZnJvbSB0aGUgVGFiaXgtZmlsZSB5ZXQhXG4oISEpIHdob3BfdGFiaXg6OmdldEZpZWxkUHRyIDogZGlkIG5vdCByZWFkIGEgbGluZSBvZiBkYXRhIGZyb20gdGhlIFRhYml4LWZpbGUgeWV0IVxuKElJKSBWQ0YgdmVyc2lvbiBpcyA0LjFcbihJSSkgVkNGIEZpbGUgY29udGFpbnMgMjUwNCBzYW1wbGVzXG5bMV0gXCI4OjEyOTU1Nzg0My0xMzAyMDc4NDJcIlxuY2w9MFxuKCEhKSB3aG9wX3RhYml4OjpnZXRGaWVsZFB0ciA6IGRpZCBub3QgcmVhZCBhIGxpbmUgb2YgZGF0YSBmcm9tIHRoZSBUYWJpeC1maWxlIHlldCFcbighISkgd2hvcF90YWJpeDo6Z2V0RmllbGRQdHIgOiBkaWQgbm90IHJlYWQgYSBsaW5lIG9mIGRhdGEgZnJvbSB0aGUgVGFiaXgtZmlsZSB5ZXQhXG4oSUkpIFZDRiB2ZXJzaW9uIGlzIDQuMVxuKElJKSBWQ0YgRmlsZSBjb250YWlucyAyNTA0IHNhbXBsZXNcblsxXSBcIjg6MTI5NTU3ODQzLTEzMDIwNzg0MlwiXG5jbD0wXG4oISEpIHdob3BfdGFiaXg6OmdldEZpZWxkUHRyIDogZGlkIG5vdCByZWFkIGEgbGluZSBvZiBkYXRhIGZyb20gdGhlIFRhYml4LWZpbGUgeWV0IVxuKCEhKSB3aG9wX3RhYml4OjpnZXRGaWVsZFB0ciA6IGRpZCBub3QgcmVhZCBhIGxpbmUgb2YgZGF0YSBmcm9tIHRoZSBUYWJpeC1maWxlIHlldCFcbihJSSkgVkNGIHZlcnNpb24gaXMgNC4xXG4oSUkpIFZDRiBGaWxlIGNvbnRhaW5zIDI1MDQgc2FtcGxlc1xuWzFdIFwiODoxMjk1NTc4NDMtMTMwMjA3ODQyXCJcbmNsPTBcbighISkgd2hvcF90YWJpeDo6Z2V0RmllbGRQdHIgOiBkaWQgbm90IHJlYWQgYSBsaW5lIG9mIGRhdGEgZnJvbSB0aGUgVGFiaXgtZmlsZSB5ZXQhXG4oISEpIHdob3BfdGFiaXg6OmdldEZpZWxkUHRyIDogZGlkIG5vdCByZWFkIGEgbGluZSBvZiBkYXRhIGZyb20gdGhlIFRhYml4LWZpbGUgeWV0IVxuKElJKSBWQ0YgdmVyc2lvbiBpcyA0LjFcbihJSSkgVkNGIEZpbGUgY29udGFpbnMgMjUwNCBzYW1wbGVzXG5bMV0gXCI4OjEyOTU1Nzg0My0xMzAyMDc4NDJcIlxuY2w9MFxuKCEhKSB3aG9wX3RhYml4OjpnZXRGaWVsZFB0ciA6IGRpZCBub3QgcmVhZCBhIGxpbmUgb2YgZGF0YSBmcm9tIHRoZSBUYWJpeC1maWxlIHlldCFcbighISkgd2hvcF90YWJpeDo6Z2V0RmllbGRQdHIgOiBkaWQgbm90IHJlYWQgYSBsaW5lIG9mIGRhdGEgZnJvbSB0aGUgVGFiaXgtZmlsZSB5ZXQhXG4oSUkpIFZDRiB2ZXJzaW9uIGlzIDQuMVxuKElJKSBWQ0YgRmlsZSBjb250YWlucyAyNTA0IHNhbXBsZXNcblsxXSBcIjg6MTI5NTU3ODQzLTEzMDIwNzg0MlwiXG5jbD0wXG4oISEpIHdob3BfdGFiaXg6OmdldEZpZWxkUHRyIDogZGlkIG5vdCByZWFkIGEgbGluZSBvZiBkYXRhIGZyb20gdGhlIFRhYml4LWZpbGUgeWV0IVxuKCEhKSB3aG9wX3RhYml4OjpnZXRGaWVsZFB0ciA6IGRpZCBub3QgcmVhZCBhIGxpbmUgb2YgZGF0YSBmcm9tIHRoZSBUYWJpeC1maWxlIHlldCFcbihJSSkgVkNGIHZlcnNpb24gaXMgNC4xXG4oSUkpIFZDRiBGaWxlIGNvbnRhaW5zIDI1MDQgc2FtcGxlc1xuWzFdIFwiODoxMjk1NTc4NDMtMTMwMjA3ODQyXCJcbmNsPTBcbighISkgd2hvcF90YWJpeDo6Z2V0RmllbGRQdHIgOiBkaWQgbm90IHJlYWQgYSBsaW5lIG9mIGRhdGEgZnJvbSB0aGUgVGFiaXgtZmlsZSB5ZXQhXG4oISEpIHdob3BfdGFiaXg6OmdldEZpZWxkUHRyIDogZGlkIG5vdCByZWFkIGEgbGluZSBvZiBkYXRhIGZyb20gdGhlIFRhYml4LWZpbGUgeWV0IVxuKElJKSBWQ0YgdmVyc2lvbiBpcyA0LjFcbihJSSkgVkNGIEZpbGUgY29udGFpbnMgMjUwNCBzYW1wbGVzXG5bMV0gXCI4OjEyOTU1Nzg0My0xMzAyMDc4NDJcIlxuY2w9MFxuKCEhKSB3aG9wX3RhYml4OjpnZXRGaWVsZFB0ciA6IGRpZCBub3QgcmVhZCBhIGxpbmUgb2YgZGF0YSBmcm9tIHRoZSBUYWJpeC1maWxlIHlldCFcbighISkgd2hvcF90YWJpeDo6Z2V0RmllbGRQdHIgOiBkaWQgbm90IHJlYWQgYSBsaW5lIG9mIGRhdGEgZnJvbSB0aGUgVGFiaXgtZmlsZSB5ZXQhXG4oSUkpIFZDRiB2ZXJzaW9uIGlzIDQuMVxuKElJKSBWQ0YgRmlsZSBjb250YWlucyAyNTA0IHNhbXBsZXNcblsxXSBcIjg6MTI5NTU3ODQzLTEzMDIwNzg0MlwiXG5jbD0wXG4oISEpIHdob3BfdGFiaXg6OmdldEZpZWxkUHRyIDogZGlkIG5vdCByZWFkIGEgbGluZSBvZiBkYXRhIGZyb20gdGhlIFRhYml4LWZpbGUgeWV0IVxuKCEhKSB3aG9wX3RhYml4OjpnZXRGaWVsZFB0ciA6IGRpZCBub3QgcmVhZCBhIGxpbmUgb2YgZGF0YSBmcm9tIHRoZSBUYWJpeC1maWxlIHlldCFcbihJSSkgVkNGIHZlcnNpb24gaXMgNC4xXG4oSUkpIFZDRiBGaWxlIGNvbnRhaW5zIDI1MDQgc2FtcGxlc1xuWzFdIFwiODoxMjk1NTc4NDMtMTMwMjA3ODQyXCJcbmNsPTBcbighISkgd2hvcF90YWJpeDo6Z2V0RmllbGRQdHIgOiBkaWQgbm90IHJlYWQgYSBsaW5lIG9mIGRhdGEgZnJvbSB0aGUgVGFiaXgtZmlsZSB5ZXQhXG4oISEpIHdob3BfdGFiaXg6OmdldEZpZWxkUHRyIDogZGlkIG5vdCByZWFkIGEgbGluZSBvZiBkYXRhIGZyb20gdGhlIFRhYml4LWZpbGUgeWV0IVxuKElJKSBWQ0YgdmVyc2lvbiBpcyA0LjFcbihJSSkgVkNGIEZpbGUgY29udGFpbnMgMjUwNCBzYW1wbGVzXG5bMV0gXCI4OjEyOTU1Nzg0My0xMzAyMDc4NDJcIlxuY2w9MFxuKCEhKSB3aG9wX3RhYml4OjpnZXRGaWVsZFB0ciA6IGRpZCBub3QgcmVhZCBhIGxpbmUgb2YgZGF0YSBmcm9tIHRoZSBUYWJpeC1maWxlIHlldCFcbighISkgd2hvcF90YWJpeDo6Z2V0RmllbGRQdHIgOiBkaWQgbm90IHJlYWQgYSBsaW5lIG9mIGRhdGEgZnJvbSB0aGUgVGFiaXgtZmlsZSB5ZXQhXG4oSUkpIFZDRiB2ZXJzaW9uIGlzIDQuMVxuKElJKSBWQ0YgRmlsZSBjb250YWlucyAyNTA0IHNhbXBsZXNcblsxXSBcIjg6MTI5NTU3ODQzLTEzMDIwNzg0MlwiXG5jbD0wXG4oISEpIHdob3BfdGFiaXg6OmdldEZpZWxkUHRyIDogZGlkIG5vdCByZWFkIGEgbGluZSBvZiBkYXRhIGZyb20gdGhlIFRhYml4LWZpbGUgeWV0IVxuKCEhKSB3aG9wX3RhYml4OjpnZXRGaWVsZFB0ciA6IGRpZCBub3QgcmVhZCBhIGxpbmUgb2YgZGF0YSBmcm9tIHRoZSBUYWJpeC1maWxlIHlldCFcbihJSSkgVkNGIHZlcnNpb24gaXMgNC4xXG4oSUkpIFZDRiBGaWxlIGNvbnRhaW5zIDI1MDQgc2FtcGxlc1xuWzFdIFwiODoxMjk1NTc4NDMtMTMwMjA3ODQyXCJcbmNsPTBcbighISkgd2hvcF90YWJpeDo6Z2V0RmllbGRQdHIgOiBkaWQgbm90IHJlYWQgYSBsaW5lIG9mIGRhdGEgZnJvbSB0aGUgVGFiaXgtZmlsZSB5ZXQhXG4oISEpIHdob3BfdGFiaXg6OmdldEZpZWxkUHRyIDogZGlkIG5vdCByZWFkIGEgbGluZSBvZiBkYXRhIGZyb20gdGhlIFRhYml4LWZpbGUgeWV0IVxuKElJKSBWQ0YgdmVyc2lvbiBpcyA0LjFcbihJSSkgVkNGIEZpbGUgY29udGFpbnMgMjUwNCBzYW1wbGVzXG5bMV0gXCI4OjEyOTU1Nzg0My0xMzAyMDc4NDJcIlxuY2w9MFxuKCEhKSB3aG9wX3RhYml4OjpnZXRGaWVsZFB0ciA6IGRpZCBub3QgcmVhZCBhIGxpbmUgb2YgZGF0YSBmcm9tIHRoZSBUYWJpeC1maWxlIHlldCFcbighISkgd2hvcF90YWJpeDo6Z2V0RmllbGRQdHIgOiBkaWQgbm90IHJlYWQgYSBsaW5lIG9mIGRhdGEgZnJvbSB0aGUgVGFiaXgtZmlsZSB5ZXQhXG4oSUkpIFZDRiB2ZXJzaW9uIGlzIDQuMVxuKElJKSBWQ0YgRmlsZSBjb250YWlucyAyNTA0IHNhbXBsZXNcblsxXSBcIjg6MTI5NTU3ODQzLTEzMDIwNzg0MlwiXG5jbD0wXG4oISEpIHdob3BfdGFiaXg6OmdldEZpZWxkUHRyIDogZGlkIG5vdCByZWFkIGEgbGluZSBvZiBkYXRhIGZyb20gdGhlIFRhYml4LWZpbGUgeWV0IVxuKCEhKSB3aG9wX3RhYml4OjpnZXRGaWVsZFB0ciA6IGRpZCBub3QgcmVhZCBhIGxpbmUgb2YgZGF0YSBmcm9tIHRoZSBUYWJpeC1maWxlIHlldCFcbihJSSkgVkNGIHZlcnNpb24gaXMgNC4xXG4oSUkpIFZDRiBGaWxlIGNvbnRhaW5zIDI1MDQgc2FtcGxlc1xuWzFdIFwiODoxMjk1NTc4NDMtMTMwMjA3ODQyXCJcbmNsPTBcbighISkgd2hvcF90YWJpeDo6Z2V0RmllbGRQdHIgOiBkaWQgbm90IHJlYWQgYSBsaW5lIG9mIGRhdGEgZnJvbSB0aGUgVGFiaXgtZmlsZSB5ZXQhXG4oISEpIHdob3BfdGFiaXg6OmdldEZpZWxkUHRyIDogZGlkIG5vdCByZWFkIGEgbGluZSBvZiBkYXRhIGZyb20gdGhlIFRhYml4LWZpbGUgeWV0IVxuKElJKSBWQ0YgdmVyc2lvbiBpcyA0LjFcbihJSSkgVkNGIEZpbGUgY29udGFpbnMgMjUwNCBzYW1wbGVzXG5bMV0gXCI4OjEyOTU1Nzg0My0xMzAyMDc4NDJcIlxuY2w9MFxuKCEhKSB3aG9wX3RhYml4OjpnZXRGaWVsZFB0ciA6IGRpZCBub3QgcmVhZCBhIGxpbmUgb2YgZGF0YSBmcm9tIHRoZSBUYWJpeC1maWxlIHlldCFcbighISkgd2hvcF90YWJpeDo6Z2V0RmllbGRQdHIgOiBkaWQgbm90IHJlYWQgYSBsaW5lIG9mIGRhdGEgZnJvbSB0aGUgVGFiaXgtZmlsZSB5ZXQhXG4oSUkpIFZDRiB2ZXJzaW9uIGlzIDQuMVxuKElJKSBWQ0YgRmlsZSBjb250YWlucyAyNTA0IHNhbXBsZXNcblsxXSBcIjg6MTI5NTU3ODQzLTEzMDIwNzg0MlwiXG5jbD0wXG4oISEpIHdob3BfdGFiaXg6OmdldEZpZWxkUHRyIDogZGlkIG5vdCByZWFkIGEgbGluZSBvZiBkYXRhIGZyb20gdGhlIFRhYml4LWZpbGUgeWV0IVxuKCEhKSB3aG9wX3RhYml4OjpnZXRGaWVsZFB0ciA6IGRpZCBub3QgcmVhZCBhIGxpbmUgb2YgZGF0YSBmcm9tIHRoZSBUYWJpeC1maWxlIHlldCFcbihJSSkgVkNGIHZlcnNpb24gaXMgNC4xXG4oSUkpIFZDRiBGaWxlIGNvbnRhaW5zIDI1MDQgc2FtcGxlc1xuWzFdIFwiODoxMjk1NTc4NDMtMTMwMjA3ODQyXCJcbmNsPTBcbighISkgd2hvcF90YWJpeDo6Z2V0RmllbGRQdHIgOiBkaWQgbm90IHJlYWQgYSBsaW5lIG9mIGRhdGEgZnJvbSB0aGUgVGFiaXgtZmlsZSB5ZXQhXG4oISEpIHdob3BfdGFiaXg6OmdldEZpZWxkUHRyIDogZGlkIG5vdCByZWFkIGEgbGluZSBvZiBkYXRhIGZyb20gdGhlIFRhYml4LWZpbGUgeWV0IVxuKElJKSBWQ0YgdmVyc2lvbiBpcyA0LjFcbihJSSkgVkNGIEZpbGUgY29udGFpbnMgMjUwNCBzYW1wbGVzXG5bMV0gXCI4OjEyOTU1Nzg0My0xMzAyMDc4NDJcIlxuY2w9MFxuKCEhKSB3aG9wX3RhYml4OjpnZXRGaWVsZFB0ciA6IGRpZCBub3QgcmVhZCBhIGxpbmUgb2YgZGF0YSBmcm9tIHRoZSBUYWJpeC1maWxlIHlldCFcbighISkgd2hvcF90YWJpeDo6Z2V0RmllbGRQdHIgOiBkaWQgbm90IHJlYWQgYSBsaW5lIG9mIGRhdGEgZnJvbSB0aGUgVGFiaXgtZmlsZSB5ZXQhXG4ifQ== -->
+<pre><code>(II) VCF version is 4.1
+(II) VCF File contains 2504 samples
+[1] &quot;8:129557843-130207842&quot;
+cl=0
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(II) VCF version is 4.1
+(II) VCF File contains 2504 samples
+[1] &quot;8:129557843-130207842&quot;
+cl=0
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(II) VCF version is 4.1
+(II) VCF File contains 2504 samples
+[1] &quot;8:129557843-130207842&quot;
+cl=0
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(II) VCF version is 4.1
+(II) VCF File contains 2504 samples
+[1] &quot;8:129557843-130207842&quot;
+cl=0
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(II) VCF version is 4.1
+(II) VCF File contains 2504 samples
+[1] &quot;8:129557843-130207842&quot;
+cl=0
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(II) VCF version is 4.1
+(II) VCF File contains 2504 samples
+[1] &quot;8:129557843-130207842&quot;
+cl=0
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(II) VCF version is 4.1
+(II) VCF File contains 2504 samples
+[1] &quot;8:129557843-130207842&quot;
+cl=0
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(II) VCF version is 4.1
+(II) VCF File contains 2504 samples
+[1] &quot;8:129557843-130207842&quot;
+cl=0
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(II) VCF version is 4.1
+(II) VCF File contains 2504 samples
+[1] &quot;8:129557843-130207842&quot;
+cl=0
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(II) VCF version is 4.1
+(II) VCF File contains 2504 samples
+[1] &quot;8:129557843-130207842&quot;
+cl=0
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(II) VCF version is 4.1
+(II) VCF File contains 2504 samples
+[1] &quot;8:129557843-130207842&quot;
+cl=0
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(II) VCF version is 4.1
+(II) VCF File contains 2504 samples
+[1] &quot;8:129557843-130207842&quot;
+cl=0
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(II) VCF version is 4.1
+(II) VCF File contains 2504 samples
+[1] &quot;8:129557843-130207842&quot;
+cl=0
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(II) VCF version is 4.1
+(II) VCF File contains 2504 samples
+[1] &quot;8:129557843-130207842&quot;
+cl=0
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(II) VCF version is 4.1
+(II) VCF File contains 2504 samples
+[1] &quot;8:129557843-130207842&quot;
+cl=0
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(II) VCF version is 4.1
+(II) VCF File contains 2504 samples
+[1] &quot;8:129557843-130207842&quot;
+cl=0
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(II) VCF version is 4.1
+(II) VCF File contains 2504 samples
+[1] &quot;8:129557843-130207842&quot;
+cl=0
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(II) VCF version is 4.1
+(II) VCF File contains 2504 samples
+[1] &quot;8:129557843-130207842&quot;
+cl=0
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(II) VCF version is 4.1
+(II) VCF File contains 2504 samples
+[1] &quot;8:129557843-130207842&quot;
+cl=0
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(II) VCF version is 4.1
+(II) VCF File contains 2504 samples
+[1] &quot;8:129557843-130207842&quot;
+cl=0
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(II) VCF version is 4.1
+(II) VCF File contains 2504 samples
+[1] &quot;8:129557843-130207842&quot;
+cl=0
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(II) VCF version is 4.1
+(II) VCF File contains 2504 samples
+[1] &quot;8:129557843-130207842&quot;
+cl=0
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(II) VCF version is 4.1
+(II) VCF File contains 2504 samples
+[1] &quot;8:129557843-130207842&quot;
+cl=0
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(II) VCF version is 4.1
+(II) VCF File contains 2504 samples
+[1] &quot;8:129557843-130207842&quot;
+cl=0
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(II) VCF version is 4.1
+(II) VCF File contains 2504 samples
+[1] &quot;8:129557843-130207842&quot;
+cl=0
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!
+(!!) whop_tabix::getFieldPtr : did not read a line of data from the Tabix-file yet!</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoibm8gbm9uLW1pc3NpbmcgYXJndW1lbnRzIHRvIG1pbjsgcmV0dXJuaW5nIEluZm5vIG5vbi1taXNzaW5nIGFyZ3VtZW50cyB0byBtYXg7IHJldHVybmluZyAtSW5mTm8gc2VsZWN0aW9uIG1hZGVubyBub24tbWlzc2luZyBhcmd1bWVudHMgdG8gbWluOyByZXR1cm5pbmcgSW5mbm8gbm9uLW1pc3NpbmcgYXJndW1lbnRzIHRvIG1heDsgcmV0dXJuaW5nIC1JbmZObyBzZWxlY3Rpb24gbWFkZW5vIG5vbi1taXNzaW5nIGFyZ3VtZW50cyB0byBtaW47IHJldHVybmluZyBJbmZubyBub24tbWlzc2luZyBhcmd1bWVudHMgdG8gbWF4OyByZXR1cm5pbmcgLUluZk5vIHNlbGVjdGlvbiBtYWRlbm8gbm9uLW1pc3NpbmcgYXJndW1lbnRzIHRvIG1pbjsgcmV0dXJuaW5nIEluZm5vIG5vbi1taXNzaW5nIGFyZ3VtZW50cyB0byBtYXg7IHJldHVybmluZyAtSW5mTm8gc2VsZWN0aW9uIG1hZGVubyBub24tbWlzc2luZyBhcmd1bWVudHMgdG8gbWluOyByZXR1cm5pbmcgSW5mbm8gbm9uLW1pc3NpbmcgYXJndW1lbnRzIHRvIG1heDsgcmV0dXJuaW5nIC1JbmZObyBzZWxlY3Rpb24gbWFkZW5vIG5vbi1taXNzaW5nIGFyZ3VtZW50cyB0byBtaW47IHJldHVybmluZyBJbmZubyBub24tbWlzc2luZyBhcmd1bWVudHMgdG8gbWF4OyByZXR1cm5pbmcgLUluZk5vIHNlbGVjdGlvbiBtYWRlbm8gbm9uLW1pc3NpbmcgYXJndW1lbnRzIHRvIG1pbjsgcmV0dXJuaW5nIEluZm5vIG5vbi1taXNzaW5nIGFyZ3VtZW50cyB0byBtYXg7IHJldHVybmluZyAtSW5mTm8gc2VsZWN0aW9uIG1hZGVubyBub24tbWlzc2luZyBhcmd1bWVudHMgdG8gbWluOyByZXR1cm5pbmcgSW5mbm8gbm9uLW1pc3NpbmcgYXJndW1lbnRzIHRvIG1heDsgcmV0dXJuaW5nIC1JbmZObyBzZWxlY3Rpb24gbWFkZW5vIG5vbi1taXNzaW5nIGFyZ3VtZW50cyB0byBtaW47IHJldHVybmluZyBJbmZubyBub24tbWlzc2luZyBhcmd1bWVudHMgdG8gbWF4OyByZXR1cm5pbmcgLUluZk5vIHNlbGVjdGlvbiBtYWRlbm8gbm9uLW1pc3NpbmcgYXJndW1lbnRzIHRvIG1pbjsgcmV0dXJuaW5nIEluZm5vIG5vbi1taXNzaW5nIGFyZ3VtZW50cyB0byBtYXg7IHJldHVybmluZyAtSW5mTm8gc2VsZWN0aW9uIG1hZGVubyBub24tbWlzc2luZyBhcmd1bWVudHMgdG8gbWluOyByZXR1cm5pbmcgSW5mbm8gbm9uLW1pc3NpbmcgYXJndW1lbnRzIHRvIG1heDsgcmV0dXJuaW5nIC1JbmZObyBzZWxlY3Rpb24gbWFkZW5vIG5vbi1taXNzaW5nIGFyZ3VtZW50cyB0byBtaW47IHJldHVybmluZyBJbmZubyBub24tbWlzc2luZyBhcmd1bWVudHMgdG8gbWF4OyByZXR1cm5pbmcgLUluZk5vIHNlbGVjdGlvbiBtYWRlbm8gbm9uLW1pc3NpbmcgYXJndW1lbnRzIHRvIG1pbjsgcmV0dXJuaW5nIEluZm5vIG5vbi1taXNzaW5nIGFyZ3VtZW50cyB0byBtYXg7IHJldHVybmluZyAtSW5mTm8gc2VsZWN0aW9uIG1hZGVubyBub24tbWlzc2luZyBhcmd1bWVudHMgdG8gbWluOyByZXR1cm5pbmcgSW5mbm8gbm9uLW1pc3NpbmcgYXJndW1lbnRzIHRvIG1heDsgcmV0dXJuaW5nIC1JbmZObyBzZWxlY3Rpb24gbWFkZW5vIG5vbi1taXNzaW5nIGFyZ3VtZW50cyB0byBtaW47IHJldHVybmluZyBJbmZubyBub24tbWlzc2luZyBhcmd1bWVudHMgdG8gbWF4OyByZXR1cm5pbmcgLUluZk5vIHNlbGVjdGlvbiBtYWRlbm8gbm9uLW1pc3NpbmcgYXJndW1lbnRzIHRvIG1pbjsgcmV0dXJuaW5nIEluZm5vIG5vbi1taXNzaW5nIGFyZ3VtZW50cyB0byBtYXg7IHJldHVybmluZyAtSW5mTm8gc2VsZWN0aW9uIG1hZGVubyBub24tbWlzc2luZyBhcmd1bWVudHMgdG8gbWluOyByZXR1cm5pbmcgSW5mbm8gbm9uLW1pc3NpbmcgYXJndW1lbnRzIHRvIG1heDsgcmV0dXJuaW5nIC1JbmZObyBzZWxlY3Rpb24gbWFkZW5vIG5vbi1taXNzaW5nIGFyZ3VtZW50cyB0byBtaW47IHJldHVybmluZyBJbmZubyBub24tbWlzc2luZyBhcmd1bWVudHMgdG8gbWF4OyByZXR1cm5pbmcgLUluZk5vIHNlbGVjdGlvbiBtYWRlbm8gbm9uLW1pc3NpbmcgYXJndW1lbnRzIHRvIG1pbjsgcmV0dXJuaW5nIEluZm5vIG5vbi1taXNzaW5nIGFyZ3VtZW50cyB0byBtYXg7IHJldHVybmluZyAtSW5mTm8gc2VsZWN0aW9uIG1hZGVubyBub24tbWlzc2luZyBhcmd1bWVudHMgdG8gbWluOyByZXR1cm5pbmcgSW5mbm8gbm9uLW1pc3NpbmcgYXJndW1lbnRzIHRvIG1heDsgcmV0dXJuaW5nIC1JbmZObyBzZWxlY3Rpb24gbWFkZW5vIG5vbi1taXNzaW5nIGFyZ3VtZW50cyB0byBtaW47IHJldHVybmluZyBJbmZubyBub24tbWlzc2luZyBhcmd1bWVudHMgdG8gbWF4OyByZXR1cm5pbmcgLUluZk5vIHNlbGVjdGlvbiBtYWRlbm8gbm9uLW1pc3NpbmcgYXJndW1lbnRzIHRvIG1pbjsgcmV0dXJuaW5nIEluZm5vIG5vbi1taXNzaW5nIGFyZ3VtZW50cyB0byBtYXg7IHJldHVybmluZyAtSW5mTm8gc2VsZWN0aW9uIG1hZGVubyBub24tbWlzc2luZyBhcmd1bWVudHMgdG8gbWluOyByZXR1cm5pbmcgSW5mbm8gbm9uLW1pc3NpbmcgYXJndW1lbnRzIHRvIG1heDsgcmV0dXJuaW5nIC1JbmZObyBzZWxlY3Rpb24gbWFkZW5vIG5vbi1taXNzaW5nIGFyZ3VtZW50cyB0byBtaW47IHJldHVybmluZyBJbmZubyBub24tbWlzc2luZyBhcmd1bWVudHMgdG8gbWF4OyByZXR1cm5pbmcgLUluZk5vIHNlbGVjdGlvbiBtYWRlbm8gbm9uLW1pc3NpbmcgYXJndW1lbnRzIHRvIG1pbjsgcmV0dXJuaW5nIEluZm5vIG5vbi1taXNzaW5nIGFyZ3VtZW50cyB0byBtYXg7IHJldHVybmluZyAtSW5mTm8gc2VsZWN0aW9uIG1hZGVubyBub24tbWlzc2luZyBhcmd1bWVudHMgdG8gbWluOyByZXR1cm5pbmcgSW5mbm8gbm9uLW1pc3NpbmcgYXJndW1lbnRzIHRvIG1heDsgcmV0dXJuaW5nIC1JbmZObyBzZWxlY3Rpb24gbWFkZVxuIn0= -->
+<pre><code>no non-missing arguments to min; returning Infno non-missing arguments to max; returning -InfNo selection madeno non-missing arguments to min; returning Infno non-missing arguments to max; returning -InfNo selection madeno non-missing arguments to min; returning Infno non-missing arguments to max; returning -InfNo selection madeno non-missing arguments to min; returning Infno non-missing arguments to max; returning -InfNo selection madeno non-missing arguments to min; returning Infno non-missing arguments to max; returning -InfNo selection madeno non-missing arguments to min; returning Infno non-missing arguments to max; returning -InfNo selection madeno non-missing arguments to min; returning Infno non-missing arguments to max; returning -InfNo selection madeno non-missing arguments to min; returning Infno non-missing arguments to max; returning -InfNo selection madeno non-missing arguments to min; returning Infno non-missing arguments to max; returning -InfNo selection madeno non-missing arguments to min; returning Infno non-missing arguments to max; returning -InfNo selection madeno non-missing arguments to min; returning Infno non-missing arguments to max; returning -InfNo selection madeno non-missing arguments to min; returning Infno non-missing arguments to max; returning -InfNo selection madeno non-missing arguments to min; returning Infno non-missing arguments to max; returning -InfNo selection madeno non-missing arguments to min; returning Infno non-missing arguments to max; returning -InfNo selection madeno non-missing arguments to min; returning Infno non-missing arguments to max; returning -InfNo selection madeno non-missing arguments to min; returning Infno non-missing arguments to max; returning -InfNo selection madeno non-missing arguments to min; returning Infno non-missing arguments to max; returning -InfNo selection madeno non-missing arguments to min; returning Infno non-missing arguments to max; returning -InfNo selection madeno non-missing arguments to min; returning Infno non-missing arguments to max; returning -InfNo selection madeno non-missing arguments to min; returning Infno non-missing arguments to max; returning -InfNo selection madeno non-missing arguments to min; returning Infno non-missing arguments to max; returning -InfNo selection madeno non-missing arguments to min; returning Infno non-missing arguments to max; returning -InfNo selection madeno non-missing arguments to min; returning Infno non-missing arguments to max; returning -InfNo selection madeno non-missing arguments to min; returning Infno non-missing arguments to max; returning -InfNo selection madeno non-missing arguments to min; returning Infno non-missing arguments to max; returning -InfNo selection madeno non-missing arguments to min; returning Infno non-missing arguments to max; returning -InfNo selection made</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>Add a new chunk by clicking the <em>Insert Chunk</em> button on the toolbar or by pressing <em>Ctrl+Alt+I</em>.</p>
-<p>When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the <em>Preview</em> button or press <em>Ctrl+Shift+K</em> to preview the HTML file).</p>
-<p>The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike <em>Knit</em>, <em>Preview</em> does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.</p>
+<p>Given the imported data we can now use the identifyHighLD function to find SNPs in high LD (R^2) with the lead-SNPs and to identify tag-SNP intervals.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucmVzdWx0cyA8LSBsbHBseShUR0RhdGEsIGZ1bmN0aW9uKHgpeyAjIyBsb29wIG92ZXIgdGhlIGltcG9ydGVkIDEwMDBHIGRhdGFcbiAgUmVkdWNlKGMsbGxwbHkocG9wdWxhdGlvbnMsIGZ1bmN0aW9uKHkpeyAjIyBsb29wIG92ZXIgcG9wdWxhdGlvbnMsIGNhbGN1bGF0ZSBMRCBldGMgYW5kIGdlbmVyYXRlIHJlc3VsdHMuXG4gICAgaWRlbnRpZnlIaWdoTEQocnNxdWFyZWQgPSB4JHJzcXVhcmVkW1t5XV0sIHgkZGF0YVtbeV1dJGluZm8sIHBvcHVsYXRpb24gPSB5KVxuICB9KSlcbn0pXG5cbmBgYCJ9 -->
+<pre class="r"><code>results &lt;- llply(TGData, function(x){ ## loop over the imported 1000G data
+  Reduce(c,llply(populations, function(y){ ## loop over populations, calculate LD etc and generate results.
+    identifyHighLD(rsquared = x$rsquared[[y]], x$data[[y]]$info, population = y)
+  }))
+})
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoibnVtYmVyIG9mIGl0ZW1zIHRvIHJlcGxhY2UgaXMgbm90IGEgbXVsdGlwbGUgb2YgcmVwbGFjZW1lbnQgbGVuZ3RoRXJyb3IgaW4gLkNhbGwyKFwic29sdmVfdXNlcl9TRVcwXCIsIHN0YXJ0LCBlbmQsIHdpZHRoLCBQQUNLQUdFID0gXCJJUmFuZ2VzXCIpIDogXG4gIHNvbHZpbmcgcm93IDE6IG5lZ2F0aXZlIHdpZHRocyBhcmUgbm90IGFsbG93ZWRcbiJ9 -->
+<pre><code>number of items to replace is not a multiple of replacement lengthError in .Call2(&quot;solve_user_SEW0&quot;, start, end, width, PACKAGE = &quot;IRanges&quot;) : 
+  solving row 1: negative widths are not allowed</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiQW5hbHlzaXMgQXBwcm9hY2ggMSIKb3V0cHV0OgogIGh0bWxfZG9jdW1lbnQ6CiAgICBkZl9wcmludDogcGFnZWQKICBodG1sX25vdGVib29rOiBkZWZhdWx0CiAgcGRmX2RvY3VtZW50OiBkZWZhdWx0Ci0tLQoKU2V0dGluZyB1cCB0aGUgYW5hbHlzaXMgZGVwZW5kZW5jaWVzIGFyZSBsb2FkZWQgYW5kIFNOUCBhbmQgcG9wdWxhdGlvbnMgdG8gYmUgYW5hbHlzZWQgYXJlIGRlZmluZWQuIEZ1cnRoZXJtb3JlLCBwYXRocyB0byAxMDAwR2Vub21lcyB2Y2YgYW5kIHRiaSBmaWxlcyBhcmUgc2V0LCBhcyB3ZWxsIGFzIHRvIHRoZSBwYW5lbCBmaWxlLgoKCmBgYHtyIFNldHRpbmcgdXAgdGhlIGVudmlyb25tZW50LCBlY2hvPVRSVUUsIG1lc3NhZ2U9RkFMU0UsIHdhcm5pbmc9RkFMU0UsIHBhZ2VkLnByaW50PUZBTFNFfQpsaWJyYXJ5KGRldnRvb2xzKQpsaWJyYXJ5KEdlbm9taWNSYW5nZXMpCmxpYnJhcnkoZ3JpZCkKbGlicmFyeShUeERiLkhzYXBpZW5zLlVDU0MuaGcxOS5rbm93bkdlbmUpCmxpYnJhcnkoU05QbG9jcy5Ic2FwaWVucy5kYlNOUDE0NC5HUkNoMzcpCmxpYnJhcnkoSG9tby5zYXBpZW5zKQoKCmxlYWRfc25wcyA8LSByZWFkLnRhYmxlKCJ+Ly4uL1N0b3JhZ2UvRG9jdW1lbnRzL1RoZXNpczEvc2VjdGlvbl9yZXN1bHRzL3RhYmxlcy9sZWFkX3NucHMuY3N2IiwgaGVhZGVyID0gVCwgc3RyaW5nc0FzRmFjdG9ycyA9IEYpJGxlYWQuU05Qcwpwb3B1bGF0aW9ucyA8LSByZWFkLnRhYmxlKCJ+Ly4uL1N0b3JhZ2UvRG9jdW1lbnRzL1RoZXNpczEvc2VjdGlvbl9hcHBlbmRpeC90YWJsZXMvMTAwMEdlbm9tZXNfcG9wdWxhdGlvbnMuY3N2IiwgaGVhZGVyID0gVCwgc3RyaW5nc0FzRmFjdG9ycyA9IEYsIHNlcCA9ICIsIikkQ29kZQoKdmNmZmlsZSA8LSAiL2hvbWUvU1NELURhdGEvMTAwMEdlbm9tZXMvQUxMLiVzLnBoYXNlM19zaGFwZWl0Ml9tdm5jYWxsX2ludGVncmF0ZWRfdjVhLjIwMTMwNTAyLmdlbm90eXBlcy52Y2YuZ3oiCnBhbmVsZmlsZSA8LSAiL2hvbWUvU1NELURhdGEvMTAwMEdlbm9tZXMvaW50ZWdyYXRlZF9jYWxsX3NhbXBsZXNfdjMuMjAxMzA1MDIuQUxMLnBhbmVsIgpgYGAKCk5leHQgaW5mb3JtYXRpb24gYWJvdXQgU05QcyBpcyBnYXRoZXJlZCBmcm9tIGRiU05QMTQ0IGFuZCBzdG9yZWQgYXMgbGVhZF9zbnBzX2dyLiBUaGVuLCA2NTBLYiBpbnRlcnZhbHMgYXJlIGNyZWF0ZWQgYXJvdW5kIHRoZSBsZWFkX1NOUHNfZ3IgY3JlYXRpbmcgYW5hbHlzaXNfaW50ZXJ2YWxzX2dyLiBGdXJ0aGVybW9yZSwgYm90aCBvYmplY3RzIGFyZSBtb2RpZmllZCB0byBoYXZlIGEgY29tbW9uIGZvcm1hdCBjb3JyZXNwb25kaW5nIHRvIFVDU0Mgc3RhbmRhcnQuCgpgYGB7cn0KbGVhZF9zbnBzX2dyIDwtIEdSYW5nZXMoc25wc0J5SWQoU05QbG9jcy5Ic2FwaWVucy5kYlNOUDE0NC5HUkNoMzcsIGxlYWRfc25wcykpCmFuYWx5c2lzX2ludGVydmFsc19nciA8LSByZXNpemUobGVhZF9zbnBzX2dyLCBmaXggPSAnY2VudGVyJywgd2lkdGggPSA2LjVlNSkKc2VxbGV2ZWxzU3R5bGUobGVhZF9zbnBzX2dyKSA8LSAiVUNTQyIKc2VxbGV2ZWxzU3R5bGUoYW5hbHlzaXNfaW50ZXJ2YWxzX2dyKSA8LSAiVUNTQyIKZ2Vub21lKGxlYWRfc25wc19ncikgPC0gTkEKZ2Vub21lKGFuYWx5c2lzX2ludGVydmFsc19ncikgPC0gTkEKYGBgCgpHaXZlbiBsZWFkX3NucHNfZ3IgYW5kIGFuYWx5c2lzX2ludGVydmFsc19nciB3ZSBjYW4gbm93IGltcG9ydCAxMDAwR2Vub21lcyBoYXBsb3R5cGUgZGF0YSB0byBjYWxjdWxhdGUgbGlua2FnZSBkaXNlcXVpbGlicml1bSBmcm9tIGxlYWQtU05QcyB0byB0aGUgMTAwMEdlbm9tZXMgdmFyaWFudHMuIEhlcmUgd2UgdXNlIHRoZSBoYXBsb3Bsb3RSIHBhY2thZ2UgdG8gaW1wb3J0IDEwMDBHZW5vbWVzIGRhdGEgYW5kIGNhbGN1bGF0ZSBSXjIgdmFsdWVzIGZvciBsZWFkX3NucHMgYW5kIHBvcHVsYXRpb25zLgoKYGBge3J9CmRldnRvb2xzOjpsb2FkX2FsbCgnL2hvbWUvU1NELURhdGEvUHJvamVjdHMvaGFwbG9wbG90Ui8nKQpyZWdpc3RlckRvTUMoY29yZXMgPSAyKQpUR0RhdGEgPC0gbGxwbHkoYW5hbHlzaXNfaW50ZXJ2YWxzX2dyLCBmdW5jdGlvbih4KXsKICBnciA8LSB4ICMgbG9jYXRpb24gd2hlcmUgcnN1YXJlZCBpcyBjYWxjdWxhdGVkCiAgZGF0YSA8LSBpbXBvcnQxMDAwR0RhdGEod2hlcmUgPSB4LCB3aGljaCA9IHBvcHVsYXRpb25zLCB2Y2ZfZmlsZSA9IHZjZmZpbGUsIHBhbmVsX2ZpbGUgPSBwYW5lbGZpbGUpICMgMTAwMEcgZGF0YQogIHJzcXVhcmVkIDwtIGxscGx5KGRhdGEsIGZ1bmN0aW9uKGRhdCkgY2FsY3VsYXRlTEQobGVhZF9zbnBzLGRhdCRnZW5vdHlwZSkpICMgcnMgZm9yIGdpdmVuIHBvcHVsYXRpb24gYW5kIGxlYWRfc25wcwogIGxpc3QoZ3IgPSBnciwgZGF0YSA9IGRhdGEsIHJzcXVhcmVkID0gcnNxdWFyZWQpICMgcmV0dXJuIGFsbCB0aGUgZGF0YSBhcyBsaXN0Cn0sIC5wYXJhbGxlbCA9IFRSVUUpCgpgYGAKCgoKQWRkIGEgbmV3IGNodW5rIGJ5IGNsaWNraW5nIHRoZSAqSW5zZXJ0IENodW5rKiBidXR0b24gb24gdGhlIHRvb2xiYXIgb3IgYnkgcHJlc3NpbmcgKkN0cmwrQWx0K0kqLgoKV2hlbiB5b3Ugc2F2ZSB0aGUgbm90ZWJvb2ssIGFuIEhUTUwgZmlsZSBjb250YWluaW5nIHRoZSBjb2RlIGFuZCBvdXRwdXQgd2lsbCBiZSBzYXZlZCBhbG9uZ3NpZGUgaXQgKGNsaWNrIHRoZSAqUHJldmlldyogYnV0dG9uIG9yIHByZXNzICpDdHJsK1NoaWZ0K0sqIHRvIHByZXZpZXcgdGhlIEhUTUwgZmlsZSkuCgpUaGUgcHJldmlldyBzaG93cyB5b3UgYSByZW5kZXJlZCBIVE1MIGNvcHkgb2YgdGhlIGNvbnRlbnRzIG9mIHRoZSBlZGl0b3IuIENvbnNlcXVlbnRseSwgdW5saWtlICpLbml0KiwgKlByZXZpZXcqIGRvZXMgbm90IHJ1biBhbnkgUiBjb2RlIGNodW5rcy4gSW5zdGVhZCwgdGhlIG91dHB1dCBvZiB0aGUgY2h1bmsgd2hlbiBpdCB3YXMgbGFzdCBydW4gaW4gdGhlIGVkaXRvciBpcyBkaXNwbGF5ZWQuCg==</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiQW5hbHlzaXMgQXBwcm9hY2ggMSIKb3V0cHV0OgogIGh0bWxfZG9jdW1lbnQ6CiAgICBkZl9wcmludDogcGFnZWQKICBodG1sX25vdGVib29rOiBkZWZhdWx0CiAgcGRmX2RvY3VtZW50OiBkZWZhdWx0Ci0tLQoKU2V0dGluZyB1cCB0aGUgYW5hbHlzaXMgZGVwZW5kZW5jaWVzIGFyZSBsb2FkZWQgYW5kIFNOUCBhbmQgcG9wdWxhdGlvbnMgdG8gYmUgYW5hbHlzZWQgYXJlIGRlZmluZWQuIEZ1cnRoZXJtb3JlLCBwYXRocyB0byAxMDAwR2Vub21lcyB2Y2YgYW5kIHRiaSBmaWxlcyBhcmUgc2V0LCBhcyB3ZWxsIGFzIHRvIHRoZSBwYW5lbCBmaWxlLgoKCmBgYHtyIFNldHRpbmcgdXAgdGhlIGVudmlyb25tZW50LCBlY2hvPVRSVUUsIG1lc3NhZ2U9RkFMU0UsIHdhcm5pbmc9RkFMU0UsIHBhZ2VkLnByaW50PUZBTFNFfQpsaWJyYXJ5KGRldnRvb2xzKQpsaWJyYXJ5KEdlbm9taWNSYW5nZXMpCmxpYnJhcnkoZ3JpZCkKbGlicmFyeShUeERiLkhzYXBpZW5zLlVDU0MuaGcxOS5rbm93bkdlbmUpCmxpYnJhcnkoU05QbG9jcy5Ic2FwaWVucy5kYlNOUDE0NC5HUkNoMzcpCmxpYnJhcnkoSG9tby5zYXBpZW5zKQoKbGVhZF9zbnBzIDwtIHJlYWQudGFibGUoIn4vLi4vU3RvcmFnZS9Eb2N1bWVudHMvVGhlc2lzMS9zZWN0aW9uX3Jlc3VsdHMvdGFibGVzL2xlYWRfc25wcy5jc3YiLCBoZWFkZXIgPSBULCBzdHJpbmdzQXNGYWN0b3JzID0gRikkbGVhZC5TTlBzWzE6Ml0KcG9wdWxhdGlvbnMgPC0gcmVhZC50YWJsZSgifi8uLi9TdG9yYWdlL0RvY3VtZW50cy9UaGVzaXMxL3NlY3Rpb25fYXBwZW5kaXgvdGFibGVzLzEwMDBHZW5vbWVzX3BvcHVsYXRpb25zLmNzdiIsIGhlYWRlciA9IFQsIHN0cmluZ3NBc0ZhY3RvcnMgPSBGLCBzZXAgPSAiLCIpJENvZGUKCnZjZmZpbGUgPC0gIi9ob21lL1NTRC1EYXRhLzEwMDBHZW5vbWVzL0FMTC4lcy5waGFzZTNfc2hhcGVpdDJfbXZuY2FsbF9pbnRlZ3JhdGVkX3Y1YS4yMDEzMDUwMi5nZW5vdHlwZXMudmNmLmd6IgpwYW5lbGZpbGUgPC0gIi9ob21lL1NTRC1EYXRhLzEwMDBHZW5vbWVzL2ludGVncmF0ZWRfY2FsbF9zYW1wbGVzX3YzLjIwMTMwNTAyLkFMTC5wYW5lbCIKYGBgCgpOZXh0IGluZm9ybWF0aW9uIGFib3V0IFNOUHMgaXMgZ2F0aGVyZWQgZnJvbSBkYlNOUDE0NCBhbmQgc3RvcmVkIGFzIGxlYWRfc25wc19nci4gVGhlbiwgNjUwS2IgaW50ZXJ2YWxzIGFyZSBjcmVhdGVkIGFyb3VuZCB0aGUgbGVhZF9TTlBzX2dyIGNyZWF0aW5nIGFuYWx5c2lzX2ludGVydmFsc19nci4gRnVydGhlcm1vcmUsIGJvdGggb2JqZWN0cyBhcmUgbW9kaWZpZWQgdG8gaGF2ZSBhIGNvbW1vbiBmb3JtYXQgY29ycmVzcG9uZGluZyB0byBVQ1NDIHN0YW5kYXJ0LgoKYGBge3J9CmxlYWRfc25wc19nciA8LSBHUmFuZ2VzKHNucHNCeUlkKFNOUGxvY3MuSHNhcGllbnMuZGJTTlAxNDQuR1JDaDM3LCBsZWFkX3NucHMpKQphbmFseXNpc19pbnRlcnZhbHNfZ3IgPC0gcmVzaXplKGxlYWRfc25wc19nciwgZml4ID0gJ2NlbnRlcicsIHdpZHRoID0gNi41ZTUpCnNlcWxldmVsc1N0eWxlKGxlYWRfc25wc19ncikgPC0gIlVDU0MiCnNlcWxldmVsc1N0eWxlKGFuYWx5c2lzX2ludGVydmFsc19ncikgPC0gIlVDU0MiCmdlbm9tZShsZWFkX3NucHNfZ3IpIDwtIE5BCmdlbm9tZShhbmFseXNpc19pbnRlcnZhbHNfZ3IpIDwtIE5BCmBgYAoKR2l2ZW4gbGVhZF9zbnBzX2dyIGFuZCBhbmFseXNpc19pbnRlcnZhbHNfZ3Igd2UgY2FuIG5vdyBpbXBvcnQgMTAwMEdlbm9tZXMgaGFwbG90eXBlIGRhdGEgdG8gY2FsY3VsYXRlIGxpbmthZ2UgZGlzZXF1aWxpYnJpdW0gZnJvbSBsZWFkLVNOUHMgdG8gdGhlIDEwMDBHZW5vbWVzIHZhcmlhbnRzLiBIZXJlIHdlIHVzZSB0aGUgaGFwbG9wbG90UiBwYWNrYWdlIHRvIGltcG9ydCAxMDAwR2Vub21lcyBmb3IgZGF0YS4KCmBgYHtyIEltcG9ydCBkYXRhfQpsaWJyYXJ5KGRvTUMpCmxpYnJhcnkocGx5cikKCmRldnRvb2xzOjpsb2FkX2FsbCgnL2hvbWUvU1NELURhdGEvUHJvamVjdHMvaGFwbG9wbG90Ui8nKQpyZWdpc3RlckRvTUMoY29yZXMgPSAyKQpUR0RhdGEgPC0gbGxwbHkoYW5hbHlzaXNfaW50ZXJ2YWxzX2dyLCBmdW5jdGlvbih4KXsKICBnciA8LSB4ICMgbG9jYXRpb24gd2hlcmUgcnN1YXJlZCBpcyBjYWxjdWxhdGVkCiAgZGF0YSA8LSBpbXBvcnQxMDAwR0RhdGEod2hlcmUgPSB4LCB3aGljaCA9IHBvcHVsYXRpb25zLCB2Y2ZfZmlsZSA9IHZjZmZpbGUsIHBhbmVsX2ZpbGUgPSBwYW5lbGZpbGUpICMgMTAwMEcgZGF0YQogIHJzcXVhcmVkIDwtIGxscGx5KGRhdGEsIGZ1bmN0aW9uKGRhdCkgY2FsY3VsYXRlTEQobGVhZF9zbnBzLGRhdCRnZW5vdHlwZSkpICMgcnMgZm9yIGdpdmVuIHBvcHVsYXRpb24gYW5kIGxlYWRfc25wcwogIGxpc3QoZ3IgPSBnciwgZGF0YSA9IGRhdGEsIHJzcXVhcmVkID0gcnNxdWFyZWQpICMgcmV0dXJuIGFsbCB0aGUgZGF0YSBhcyBsaXN0Cn0sIC5wYXJhbGxlbCA9IFRSVUUpCmBgYApHaXZlbiB0aGUgaW1wb3J0ZWQgZGF0YSB3ZSBjYW4gbm93IHVzZSB0aGUgaWRlbnRpZnlIaWdoTEQgZnVuY3Rpb24gdG8gZmluZCBTTlBzIGluIGhpZ2ggTEQgKFJeMikgd2l0aCB0aGUgbGVhZC1TTlBzIGFuZCB0byBpZGVudGlmeSB0YWctU05QIGludGVydmFscy4KCmBgYHtSIENvbXB1dGUgUl4yIGFuZCBmaW5kIHRhZy1TTlAgaW50ZXJ2YWxzfQpyZXN1bHRzIDwtIGxscGx5KFRHRGF0YSwgZnVuY3Rpb24oeCl7ICMjIGxvb3Agb3ZlciB0aGUgaW1wb3J0ZWQgMTAwMEcgZGF0YQogIFJlZHVjZShjLGxscGx5KHBvcHVsYXRpb25zLCBmdW5jdGlvbih5KXsgIyMgbG9vcCBvdmVyIHBvcHVsYXRpb25zLCBjYWxjdWxhdGUgTEQgZXRjIGFuZCBnZW5lcmF0ZSByZXN1bHRzLgogICAgaWRlbnRpZnlIaWdoTEQocnNxdWFyZWQgPSB4JHJzcXVhcmVkW1t5XV0sIHgkZGF0YVtbeV1dJGluZm8sIHBvcHVsYXRpb24gPSB5KQogIH0pKQp9KQoKbmFtZXMocmVzdWx0cykgPC0gUmVkdWNlKGMsTWFwKGZ1bmN0aW9uKHgpIHBhc3RlKHgkZ3IseCRnciRSZWZTTlBfaWQsIHNlcCA9ICJfIiksIFRHRGF0YSkpCmBgYAoK</div>
 
 
 

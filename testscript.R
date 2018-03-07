@@ -596,3 +596,4 @@ Reduce(unlist,res)
 
 
 
+identifyHighLD(rsquared = TGData[[1]]$rsquared$ACB, info = TGData[[1]]$data$ACB$info)

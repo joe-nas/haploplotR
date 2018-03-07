@@ -6,6 +6,8 @@ library(SNPlocs.Hsapiens.dbSNP144.GRCh37)
 library(Homo.sapiens)
 library(doMC)
 library(plyr)
+devtools::load_all("/scratch/jfalck/git/haploplotR")
+
 
 lead_snps<-c("rs79997038","rs79084855","rs560426","rs66515264","rs751399","rs10498466","rs12569773","rs4615961","rs10983654",
 "rs1512262","rs11119348","rs12566152","rs2865509","rs11698025","rs59138205","rs59626211","rs227727","rs227731",
@@ -17,7 +19,7 @@ lead_snps<-c("rs79997038","rs79084855","rs560426","rs66515264","rs751399","rs104
 "rs17085106","rs7590268","rs10863790","rs7078160","rs9574565","rs1258763","rs17760296","rs2294426","rs861020",
 "rs13041247","rs742071","rs7632427","rs12543318","rs8001641","rs1873147","rs8076457","rs4441471","rs1373453",
 "rs7846606","rs7820074","rs4132699","rs13542","rs813218","rs3815854","rs4703516","rs7950069","rs5765956",
-"rs1536895")[1:10]
+"rs1536895")
 
 populations<-c("ACB","ASW","ESN","GWD","LWK","MSL","YRI","CLM","MXL","PEL","PUR","CDX","CHB","CHS","JPT","KHV","CEU",
                "FIN","GBR","IBS","TSI","BEB", "GIH","ITU","PJL","STU")
@@ -32,8 +34,7 @@ seqlevelsStyle(analysis_intervals_gr)<-"UCSC"
 genome(lead_snps_gr)<-NA
 genome(analysis_intervals_gr)<-NA
 
-devtools::load_all('/home/SSD-Data/Projects/haploplotR/')
-registerDoMC(cores=12)
+registerDoMC(cores=16)
 TGData<-llply(analysis_intervals_gr,function(x){
 gr<-x#locationwherersuarediscalculated
 data<-import1000GData(where=x,which=populations,vcf_file=vcffile,panel_file=panelfile)#1000Gdata
@@ -49,4 +50,4 @@ identifyHighLD(rsquared=x$rsquared[[y]],x$data[[y]]$info,population=y)
 
 names(results)<-Reduce(c,Map(function(x)paste(x$gr,x$gr$RefSNP_id,sep="_"),TGData))
 
-saveRDS(results,compress = "gzip")
+saveRDS(results, file = "results.rds", compress = T)
