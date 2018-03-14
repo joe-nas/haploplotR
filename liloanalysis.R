@@ -22,7 +22,7 @@ if(Sys.getenv("LOGNAME") == "jfalck"){
                "rs17085106","rs7590268","rs10863790","rs7078160","rs9574565","rs1258763","rs17760296","rs2294426","rs861020",
                "rs13041247","rs742071","rs7632427","rs12543318","rs8001641","rs1873147","rs8076457","rs4441471","rs1373453",
                "rs7846606","rs7820074","rs4132699","rs13542","rs813218","rs3815854","rs4703516","rs7950069","rs5765956",
-               "rs1536895")
+               "rs1536895")[c(8:11,28)]
 
   populations<-c("ACB","ASW","ESN","GWD","LWK","MSL","YRI","CLM","MXL","PEL","PUR","CDX","CHB","CHS","JPT","KHV","CEU",
                  "FIN","GBR","IBS","TSI","BEB", "GIH","ITU","PJL","STU")
@@ -41,7 +41,7 @@ if(Sys.getenv("LOGNAME") == "jfalck"){
                "rs17085106","rs7590268","rs10863790","rs7078160","rs9574565","rs1258763","rs17760296","rs2294426","rs861020",
                "rs13041247","rs742071","rs7632427","rs12543318","rs8001641","rs1873147","rs8076457","rs4441471","rs1373453",
                "rs7846606","rs7820074","rs4132699","rs13542","rs813218","rs3815854","rs4703516","rs7950069","rs5765956",
-               "rs1536895")[8:11]
+               "rs1536895")[8:11,28]
 
   populations<-c("ACB","ASW","ESN","GWD","LWK","MSL","YRI","CLM","MXL","PEL","PUR","CDX","CHB","CHS","JPT","KHV","CEU",
                  "FIN","GBR","IBS","TSI","BEB", "GIH","ITU","PJL","STU")
@@ -64,16 +64,21 @@ TGData<-llply(analysis_intervals_gr,function(x){
   gr<-x#locationwherersuarediscalculated
   data<-import1000GData(where=x,which=populations,vcf_file=vcffile,panel_file=panelfile)#1000Gdata
   rsquared<-Filter(function(y){!is.null(y)},llply(data,function(dat) calculateLD(lead_snps = lead_snps, dat$genotype)))#rsforgivenpopulationandlead_snps
-  highld <- Reduce(c,llply(names(rsquared),function(y){
-    identifyHighLD(rsquared=rsquared[[y]],data[[y]]$info,population=y)
-  }))
-  list(gr=gr,data=data,rsquared=rsquared, lead_snps=lead_snps, highld = highld)#returnallthedataaslist
+  # highld <- Reduce(c,llply(names(rsquared),function(y){
+  #  identifyHighLD(rsquared=rsquared[[y]],data[[y]]$info,population=y)
+  # }))
+  list(gr=gr,data=data,rsquared=rsquared, lead_snps=lead_snps)#,
+       # highld = highld)#returnallthedataaslist
 },.parallel=TRUE)
 
 saveRDS(TGData, file="TGData.rds")
 
-# results<-llply(TGData,function(x){
-#   Reduce(c,llply(names(x$rsquared),function(y){
-#     identifyHighLD(rsquared=x$rsquared[[y]],x$data[[y]]$info,population=y)
-#   }))
-# })
+results<-llply(TGData,function(x){
+  Reduce(c,llply(names(x$rsquared),function(y){
+    identifyHighLD(rsquared=x$rsquared[[y]],x$data[[y]]$info,population=y)
+  }))
+})
+
+
+results<-with(TGData[[1]],Reduce(c,llply(names(rsquared),function(y){
+    identifyHighLD(rsquared=rsquared[[y]],data[[y]]$info,population=y)})))
