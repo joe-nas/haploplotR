@@ -12,14 +12,20 @@
 
 
 calculateLD <- function(lead_snps, xSnpMatrix, ...){
-  ySnpMatrix <- xSnpMatrix[,which(colnames(xSnpMatrix) %in% lead_snps)] # limit the calculation to this lead_snps
+  idx <- which(colnames(xSnpMatrix) %in% lead_snps)
+  if(length(idx) != 0){
+    ySnpMatrix <- xSnpMatrix[,which(colnames(xSnpMatrix) %in% lead_snps)] # limit the calculation to this lead_snps
+    snpStats::ld(x = xSnpMatrix, y = ySnpMatrix, stats = c('R.squared'))
+  }else{
+    NULL
+  }
 
   # this function needs optimization! when lead_snps are not found in the data, pairwise LD is calculated on xSnpMatrix x xSnpMatrix
 #  if(dim(ySnpMatrix == xSnpMatrix)){
 #    colnames(xSnpMatrix)
 #  }else{
-
-    snpStats::ld(x = xSnpMatrix, y = ySnpMatrix, stats = c('R.squared'))
-
 #  }
 }
+
+## debug
+#calculateLD(lead_snps,TGData[[11]]$data$LWK$genotype)
