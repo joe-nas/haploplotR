@@ -1,0 +1,91 @@
+library(R6)
+
+lead_snps<-c("rs79997038","rs79084855","rs560426","rs66515264","rs751399","rs10498466","rs12569773","rs4615961","rs10983654",
+             "rs1512262","rs11119348","rs12566152","rs2865509","rs11698025","rs59138205","rs59626211","rs227727","rs227731",
+             "rs9904526","rs9891446","rs112924906","rs643310","rs28474857","rs10886036","rs1898349","rs7017665","rs13266917",
+             "rs139971355","rs143478693","rs188674070","rs12895971","rs1047057","rs1649202","rs1877432","rs2808672","rs7543674",
+             "rs11119438","rs11699548","rs2144129","rs62291848","rs28809250","rs16957824","rs7208324","rs6503169","rs2177787",
+             "rs116790447","rs77826974","rs61076166","rs10985356","rs61873036","rs72728755","rs17242358","rs10818050","rs7362194",
+             "rs7679350","rs59308021","rs72809921","rs72809924","rs12028175","rs4920339","rs357537","rs987525","rs642961",
+             "rs17085106","rs7590268","rs10863790","rs7078160","rs9574565","rs1258763","rs17760296","rs2294426","rs861020",
+             "rs13041247","rs742071","rs7632427","rs12543318","rs8001641","rs1873147","rs8076457","rs4441471","rs1373453",
+             "rs7846606","rs7820074","rs4132699","rs13542","rs813218","rs3815854","rs4703516","rs7950069","rs5765956",
+             "rs1536895")
+
+populations<-c("ACB","ASW","ESN","GWD","LWK","MSL","YRI","CLM","MXL","PEL","PUR","CDX","CHB","CHS","JPT","KHV","CEU",
+               "FIN","GBR","IBS","TSI","BEB", "GIH","ITU","PJL","STU")
+
+LDABase <- R6Class("LDABase",
+                   public = list(
+                     lead_snps = NULL,
+                     populations = NULL,
+                     vcf_file = NULL,
+                     panel_file = NULL,
+                     initialize = function(lead_snps = NA, populations = NA, file_path = ".",
+                                           vcf_file = "ALL.%s.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz",
+                                           panel_file = "integrated_call_samples_v3.20130502.ALL.panel"){
+                       self$lead_snps <- lead_snps
+                       self$populations <- populations
+                       self$panel_file <- file.path(file_path,panel_file)
+                       self$vcf_file <- file.path(file_path, vcf_file)
+                     }
+                   ))
+
+
+LDAImport <- R6Class("LDAImport",
+  public = list(
+    ldabase = NULL,
+    granges = NULL,
+    populations = NULL,
+    data = NULL,
+    initialize = function(ldabase = LDABase$new(), granges = GRanges(), populations = NA){
+      self$ldabase <- ldabase
+      self$granges <- granges
+      self$populations <- populations
+    },set_data = function(){
+      self$data <- import1000GData(where = self$granges, which = self$populations, vcf_file = self$ldabase$vcf_file,
+                                           panel_file = self$ldabase$panel_file)
+      invisible(self$data)
+    }
+  )
+)
+
+LDAanalysis1 <- R6Class("LDAanalysis1",
+  public = list(
+    lda_import = NULL,
+    lead_snps = NULL,
+    cutoff = NULL,
+    rsquared = NULL,
+    results = NULL,
+    initialize = function(lead_snps = NA, cutoff = 0.8, lda_import = NA){
+      self$lda_import <- lda_import
+      self$lead_snps <- lead_snps
+      self$cutoff <- cutoff
+    },
+    set_rsquared = function(){
+      cat(paste0("Calculating R squared.\n"))
+      self$rsquared <- llply(self$lda_import, function(x){
+        calculateLD(lead_snps = lead_snps, xSnpMatrix = x$genotype)
+      })
+      invisible(self$rsquared)
+    },
+    set_results = function(){
+      cat(paste0("Finding HighLD intervals.\n"))
+      self$results <- Reduce(c, Filter(function(x) {!is.null(x)}, llply(names(self$rsquared), function(y){
+        identifyHighLD(rsquared = self$rsquared[[y]], info = self$lda_import[[y]]$info, cutoff = self$cutoff,
+                       population = y)})))
+      invisible(self$results)
+    }
+  ))
+
+ldabase <- LDABase$new(file_path = "/home/SSD-Data/1000Genomes/")
+ldaimports <- LDAImport$new(ldabase = ldabase, granges = analysis_intervals_gr[1], populations = populations)$set_data()
+ldaanalysis1 <- LDAanalysis1$new(lead_snps = lead_snps, cutoff = 0.8, lda_import = ldaimports)
+ldaanalysis1$set_rsquared()
+ldaanalysis1$set_results()
+ldaanalysis1$results
+
+
+#https://cran.r-project.org/web/packages/R6/vignettes/Introduction.html
+
+
