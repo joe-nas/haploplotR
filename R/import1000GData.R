@@ -9,7 +9,7 @@
 #' COMPLETE EXAMPLES
 
 
-import1000GData <- function(where, which, vcf_file, panel_file){
+import1000GData <- function(where, which, vcf_file, panel_file, ...){
   # capture.output({
   panel_file <- read.table(panel_file, header = T, stringsAsFactors = F)
   panel_file_pops <- split(panel_file, panel_file$pop)[which]
