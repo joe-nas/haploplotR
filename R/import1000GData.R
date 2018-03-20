@@ -28,9 +28,9 @@ import1000GData <- function(where, which, vcf_file, panel_file, ...){
     #print(x)
 
     WhopGenome::vcf_selectsamples(vcf_handle, which)
+    WhopGenome::vcf_getregion(vcf_handle)
 
-
-    print(WhopGenome::vcf_getregion(vcf_handle))
+    #print(WhopGenome::vcf_getregion(vcf_handle))
     ## create info df
     ids <- c()
     pos <- c()
