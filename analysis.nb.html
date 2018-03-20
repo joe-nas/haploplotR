@@ -176,14 +176,30 @@ $(document).ready(function () {
 <p>Setting up the analysis dependencies are loaded and SNP and populations to be analysed are defined. Furthermore, paths to 1000Genomes vcf and tbi files are set, as well as to the panel file.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShkZXZ0b29scylcbmxpYnJhcnkoR2Vub21pY1JhbmdlcylcbmxpYnJhcnkoZ3JpZCl1c2luZ1xuXG5gYGAifQ== -->
-<pre class="r"><code>library(devtools)
-library(GenomicRanges)
-library(grid)using
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGV2dG9vbHM6Omluc3RhbGxfZ2l0aHViKHJlcG8gPSBcImpvZS1uYXMvaGFwbG9wbG90UlwiKVxuXG5gYGAifQ== -->
+<pre class="r"><code>devtools::install_github(repo = &quot;joe-nas/haploplotR&quot;)
 </code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiRXJyb3I6IHVuZXhwZWN0ZWQgc3ltYm9sIGluIFwibGlicmFyeShncmlkKXVzaW5nXCJcbiJ9 -->
-<pre><code>Error: unexpected symbol in &quot;library(grid)using&quot;</code></pre>
+<!-- rnb-output-begin eyJkYXRhIjoiKiBpbnN0YWxsaW5nICpzb3VyY2UqIHBhY2thZ2Ug4oCYaGFwbG9wbG90UuKAmSAuLi5cbioqIGxpYnNcbiJ9 -->
+<pre><code>* installing *source* package ‘haploplotR’ ...
+** libs</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiZysrICAtSS91c3IvaW5jbHVkZS9SLyAtRE5ERUJVRyAgLUlcIi9ob21lL1NTRC1EYXRhL1IveDg2XzY0LXBjLWxpbnV4LWdudS1saWJyYXJ5LzMuNC9SY3BwL2luY2x1ZGVcIiAtRF9GT1JUSUZZX1NPVVJDRT0yICAgLWZwaWMgIC1tYXJjaD14ODYtNjQgLW10dW5lPWdlbmVyaWMgLU8yIC1waXBlIC1mc3RhY2stcHJvdGVjdG9yLXN0cm9uZyAtZm5vLXBsdCAgLWMgUmNwcEV4cG9ydHMuY3BwIC1vIFJjcHBFeHBvcnRzLm9cbmcrKyAgLUkvdXNyL2luY2x1ZGUvUi8gLUROREVCVUcgIC1JXCIvaG9tZS9TU0QtRGF0YS9SL3g4Nl82NC1wYy1saW51eC1nbnUtbGlicmFyeS8zLjQvUmNwcC9pbmNsdWRlXCIgLURfRk9SVElGWV9TT1VSQ0U9MiAgIC1mcGljICAtbWFyY2g9eDg2LTY0IC1tdHVuZT1nZW5lcmljIC1PMiAtcGlwZSAtZnN0YWNrLXByb3RlY3Rvci1zdHJvbmcgLWZuby1wbHQgIC1jIHNldFlDb29yZHMuY3BwIC1vIHNldFlDb29yZHMub1xuZysrICAtSS91c3IvaW5jbHVkZS9SLyAtRE5ERUJVRyAgLUlcIi9ob21lL1NTRC1EYXRhL1IveDg2XzY0LXBjLWxpbnV4LWdudS1saWJyYXJ5LzMuNC9SY3BwL2luY2x1ZGVcIiAtRF9GT1JUSUZZX1NPVVJDRT0yICAgLWZwaWMgIC1tYXJjaD14ODYtNjQgLW10dW5lPWdlbmVyaWMgLU8yIC1waXBlIC1mc3RhY2stcHJvdGVjdG9yLXN0cm9uZyAtZm5vLXBsdCAgLWMgdG9SYXdTbnBNYXQuY3BwIC1vIHRvUmF3U25wTWF0Lm9cbmcrKyAtc2hhcmVkIC1ML3Vzci9saWI2NC9SL2xpYiAtV2wsLU8xLC0tc29ydC1jb21tb24sLS1hcy1uZWVkZWQsLXoscmVscm8sLXosbm93IC1vIGhhcGxvcGxvdFIuc28gUmNwcEV4cG9ydHMubyBzZXRZQ29vcmRzLm8gdG9SYXdTbnBNYXQubyAtTC91c3IvbGliNjQvUi9saWIgLWxSXG4ifQ== -->
+<pre><code>g++  -I/usr/include/R/ -DNDEBUG  -I&quot;/home/SSD-Data/R/x86_64-pc-linux-gnu-library/3.4/Rcpp/include&quot; -D_FORTIFY_SOURCE=2   -fpic  -march=x86-64 -mtune=generic -O2 -pipe -fstack-protector-strong -fno-plt  -c RcppExports.cpp -o RcppExports.o
+g++  -I/usr/include/R/ -DNDEBUG  -I&quot;/home/SSD-Data/R/x86_64-pc-linux-gnu-library/3.4/Rcpp/include&quot; -D_FORTIFY_SOURCE=2   -fpic  -march=x86-64 -mtune=generic -O2 -pipe -fstack-protector-strong -fno-plt  -c setYCoords.cpp -o setYCoords.o
+g++  -I/usr/include/R/ -DNDEBUG  -I&quot;/home/SSD-Data/R/x86_64-pc-linux-gnu-library/3.4/Rcpp/include&quot; -D_FORTIFY_SOURCE=2   -fpic  -march=x86-64 -mtune=generic -O2 -pipe -fstack-protector-strong -fno-plt  -c toRawSnpMat.cpp -o toRawSnpMat.o
+g++ -shared -L/usr/lib64/R/lib -Wl,-O1,--sort-common,--as-needed,-z,relro,-z,now -o haploplotR.so RcppExports.o setYCoords.o toRawSnpMat.o -L/usr/lib64/R/lib -lR</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiaW5zdGFsbGluZyB0byAvaG9tZS9TU0QtRGF0YS9SL3g4Nl82NC1wYy1saW51eC1nbnUtbGlicmFyeS8zLjQvaGFwbG9wbG90Ui9saWJzXG4qKiBSXG4qKiBwcmVwYXJpbmcgcGFja2FnZSBmb3IgbGF6eSBsb2FkaW5nXG5FcnJvciBpbiBSNkNsYXNzKFwiTERBQmFzZVwiLCBwdWJsaWMgPSBsaXN0KGxlYWRfc25wcyA9IE5VTEwsIHBvcHVsYXRpb25zID0gTlVMTCwgIDogXG4gIGNvdWxkIG5vdCBmaW5kIGZ1bmN0aW9uIFwiUjZDbGFzc1wiXG5FcnJvciA6IHVuYWJsZSB0byBsb2FkIFIgY29kZSBpbiBwYWNrYWdlIOKAmGhhcGxvcGxvdFLigJlcbkVSUk9SOiBsYXp5IGxvYWRpbmcgZmFpbGVkIGZvciBwYWNrYWdlIOKAmGhhcGxvcGxvdFLigJlcbiogcmVtb3Zpbmcg4oCYL2hvbWUvU1NELURhdGEvUi94ODZfNjQtcGMtbGludXgtZ251LWxpYnJhcnkvMy40L2hhcGxvcGxvdFLigJlcbiogcmVzdG9yaW5nIHByZXZpb3VzIOKAmC9ob21lL1NTRC1EYXRhL1IveDg2XzY0LXBjLWxpbnV4LWdudS1saWJyYXJ5LzMuNC9oYXBsb3Bsb3RS4oCZXG4ifQ== -->
+<pre><code>installing to /home/SSD-Data/R/x86_64-pc-linux-gnu-library/3.4/haploplotR/libs
+** R
+** preparing package for lazy loading
+Error in R6Class(&quot;LDABase&quot;, public = list(lead_snps = NULL, populations = NULL,  : 
+  could not find function &quot;R6Class&quot;
+Error : unable to load R code in package ‘haploplotR’
+ERROR: lazy loading failed for package ‘haploplotR’
+* removing ‘/home/SSD-Data/R/x86_64-pc-linux-gnu-library/3.4/haploplotR’
+* restoring previous ‘/home/SSD-Data/R/x86_64-pc-linux-gnu-library/3.4/haploplotR’</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->

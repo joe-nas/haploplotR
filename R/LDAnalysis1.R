@@ -1,3 +1,4 @@
+require(R6)
 LDAanalysis1 <- R6Class("LDAanalysis1",
                         public = list(
                           lda_import = NULL,

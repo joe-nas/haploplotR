@@ -15,5 +15,7 @@ Imports:
     snpStats,
     biovizBase,
     Homo.sapiens
+Suggests: 
+    doMC
 LinkingTo: Rcpp
 RoxygenNote: 5.0.0

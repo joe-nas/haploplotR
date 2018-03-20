@@ -1,3 +1,4 @@
+require(R6)
 LDAImport <- R6Class("LDAImport",
                      public = list(
                        ldabase = NULL,
