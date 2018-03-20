@@ -17,12 +17,13 @@ library(grid)
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 library(SNPlocs.Hsapiens.dbSNP144.GRCh37)
 library(Homo.sapiens)
+devtools::install_github(repo = "joe-nas/haploplotR")
+devtools::load_all("/path/to/haploplotR")
 
 lead_snps <- read.table("~/../Storage/Documents/Thesis1/section_results/tables/lead_snps.csv", header = T, stringsAsFactors = F)$lead.SNPs[1:2]
 populations <- read.table("~/../Storage/Documents/Thesis1/section_appendix/tables/1000Genomes_populations.csv", header = T, stringsAsFactors = F, sep = ",")$Code
 
-vcffile <- "/home/SSD-Data/1000Genomes/ALL.%s.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz"
-panelfile <- "/home/SSD-Data/1000Genomes/integrated_call_samples_v3.20130502.ALL.panel"
+ldabase <- LDABase$new(file_path = "/scratch/jfalck/1000G")
 ```
 
 Next information about SNPs is gathered from dbSNP144 and stored as lead_snps_gr. Then, 650Kb intervals are created around the lead_SNPs_gr creating analysis_intervals_gr. Furthermore, both objects are modified to have a common format corresponding to UCSC standart.
