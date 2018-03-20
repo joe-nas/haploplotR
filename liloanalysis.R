@@ -11,7 +11,7 @@ if(Sys.getenv("LOGNAME") == "jfalck"){
   devtools::load_all("/scratch/jfalck/git/haploplotR")
   vcffile<-"/scratch/jfalck/1000G/ALL.%s.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz"
   panelfile<-"/scratch/jfalck/1000G/integrated_call_samples_v3.20130502.ALL.panel"
-  registerDoMC(cores=16)
+  registerDoMC(cores=10)
   lead_snps<-c("rs79997038","rs79084855","rs560426","rs66515264","rs751399","rs10498466","rs12569773","rs4615961","rs10983654",
                "rs1512262","rs11119348","rs12566152","rs2865509","rs11698025","rs59138205","rs59626211","rs227727","rs227731",
                "rs9904526","rs9891446","rs112924906","rs643310","rs28474857","rs10886036","rs1898349","rs7017665","rs13266917",

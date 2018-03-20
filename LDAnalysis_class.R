@@ -12,7 +12,7 @@ if(Sys.getenv("LOGNAME") == "jfalck"){
   devtools::load_all("/scratch/jfalck/git/haploplotR")
   vcffile<-"/scratch/jfalck/1000G/ALL.%s.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz"
   panelfile<-"/scratch/jfalck/1000G/integrated_call_samples_v3.20130502.ALL.panel"
-  registerDoMC(cores=16)
+  registerDoMC(cores=10)
   lead_snps<-c("rs79997038","rs79084855","rs560426","rs66515264","rs751399","rs10498466","rs12569773","rs4615961","rs10983654",
                "rs1512262","rs11119348","rs12566152","rs2865509","rs11698025","rs59138205","rs59626211","rs227727","rs227731",
                "rs9904526","rs9891446","rs112924906","rs643310","rs28474857","rs10886036","rs1898349","rs7017665","rs13266917",
@@ -23,7 +23,7 @@ if(Sys.getenv("LOGNAME") == "jfalck"){
                "rs17085106","rs7590268","rs10863790","rs7078160","rs9574565","rs1258763","rs17760296","rs2294426","rs861020",
                "rs13041247","rs742071","rs7632427","rs12543318","rs8001641","rs1873147","rs8076457","rs4441471","rs1373453",
                "rs7846606","rs7820074","rs4132699","rs13542","rs813218","rs3815854","rs4703516","rs7950069","rs5765956",
-               "rs1536895")
+               "rs1536895")[c(8:11,28)]
 
   populations<-c("ACB","ASW","ESN","GWD","LWK","MSL","YRI","CLM","MXL","PEL","PUR","CDX","CHB","CHS","JPT","KHV","CEU",
                  "FIN","GBR","IBS","TSI","BEB", "GIH","ITU","PJL","STU")
@@ -56,6 +56,7 @@ LDABase <- R6Class("LDABase",
                      populations = NULL,
                      vcf_file = NULL,
                      panel_file = NULL,
+                     file_path = NULL,
                      initialize = function(lead_snps = NA, populations = NA, file_path = ".",
                                            vcf_file = "ALL.%s.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz",
                                            panel_file = "integrated_call_samples_v3.20130502.ALL.panel"){
@@ -63,6 +64,7 @@ LDABase <- R6Class("LDABase",
                        self$populations <- populations
                        self$panel_file <- file.path(file_path,panel_file)
                        self$vcf_file <- file.path(file_path, vcf_file)
+                       self$file_path <- file_path
                      }
                    ))
 
@@ -147,7 +149,8 @@ lead_snps<-c("rs79997038","rs79084855","rs560426","rs66515264","rs751399","rs104
              "rs7846606","rs7820074","rs4132699","rs13542","rs813218","rs3815854","rs4703516","rs7950069","rs5765956",
              "rs1536895")
 
-ldaimports <- LDAImport$new(ldabase = ldabase, granges = analysis_intervals_gr, populations = populations)$set_data()
+ldabase <- LDABase$new(file_path="/scratch/jfalck/1000G")
+ldaimports <- LDAImport$new(ldabase = ldabase, granges = analysis_intervals_gr[5], populations = populations)$set_data()
 ldaanalysis1 <- LDAanalysis1$new(lead_snps = lead_snps, cutoff = 0.8, lda_import = ldaimports)
 ldaanalysis1$set_rsquared()
 ldaanalysis1$set_results()
