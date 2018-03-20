@@ -50,70 +50,70 @@ if(Sys.getenv("LOGNAME") == "jfalck"){
 
 }
 
-LDABase <- R6Class("LDABase",
-                   public = list(
-                     lead_snps = NULL,
-                     populations = NULL,
-                     vcf_file = NULL,
-                     panel_file = NULL,
-                     file_path = NULL,
-                     initialize = function(lead_snps = NA, populations = NA, file_path = ".",
-                                           vcf_file = "ALL.%s.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz",
-                                           panel_file = "integrated_call_samples_v3.20130502.ALL.panel"){
-                       self$lead_snps <- lead_snps
-                       self$populations <- populations
-                       self$panel_file <- file.path(file_path,panel_file)
-                       self$vcf_file <- file.path(file_path, vcf_file)
-                       self$file_path <- file_path
-                     }
-                   ))
-
-
-LDAImport <- R6Class("LDAImport",
-  public = list(
-    ldabase = NULL,
-    granges = NULL,
-    populations = NULL,
-    data = NULL,
-    initialize = function(ldabase = LDABase$new(), granges = GRanges(), populations = NA){
-      self$ldabase <- ldabase
-      self$granges <- granges
-      self$populations <- populations
-    },set_data = function(){
-      self$data <- import1000GData(where = self$granges, which = self$populations, vcf_file = self$ldabase$vcf_file,
-                                           panel_file = self$ldabase$panel_file)
-      invisible(self$data)
-    }
-  )
-)
-
-LDAanalysis1 <- R6Class("LDAanalysis1",
-                        public = list(
-                          lda_import = NULL,
-                          lead_snps = NULL,
-                          cutoff = NULL,
-                          rsquared = NULL,
-                          results = NULL,
-                          initialize = function(lead_snps = NA, cutoff = 0.8, lda_import = NA){
-                            self$lda_import <- lda_import
-                            self$lead_snps <- lead_snps
-                            self$cutoff <- cutoff
-                          },
-                          set_rsquared = function(){
-                            cat(paste0("Calculating R squared.\n"))
-                            self$rsquared <- Filter(function(x) {!is.null(x)}, llply(self$lda_import, function(x){
-                              calculateLD(lead_snps = lead_snps, xSnpMatrix = x$genotype)
-                            }))
-                            invisible(self$rsquared)
-                          },
-                          set_results = function(){
-                            cat(paste0("Finding HighLD intervals.\n"))
-                            self$results <- Reduce(c, llply(names(self$rsquared), function(y){
-                              identifyHighLD(rsquared = self$rsquared[[y]], info = self$lda_import[[y]]$info, cutoff = self$cutoff,
-                                             population = y)}))
-                            invisible(self$results)
-                          }
-                        ))
+# LDABase <- R6Class("LDABase",
+#                    public = list(
+#                      lead_snps = NULL,
+#                      populations = NULL,
+#                      vcf_file = NULL,
+#                      panel_file = NULL,
+#                      file_path = NULL,
+#                      initialize = function(lead_snps = NA, populations = NA, file_path = ".",
+#                                            vcf_file = "ALL.%s.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz",
+#                                            panel_file = "integrated_call_samples_v3.20130502.ALL.panel"){
+#                        self$lead_snps <- lead_snps
+#                        self$populations <- populations
+#                        self$panel_file <- file.path(file_path,panel_file)
+#                        self$vcf_file <- file.path(file_path, vcf_file)
+#                        self$file_path <- file_path
+#                      }
+#                    ))
+#
+#
+# LDAImport <- R6Class("LDAImport",
+#   public = list(
+#     ldabase = NULL,
+#     granges = NULL,
+#     populations = NULL,
+#     data = NULL,
+#     initialize = function(ldabase = LDABase$new(), granges = GRanges(), populations = NA){
+#       self$ldabase <- ldabase
+#       self$granges <- granges
+#       self$populations <- populations
+#     },set_data = function(){
+#       self$data <- import1000GData(where = self$granges, which = self$populations, vcf_file = self$ldabase$vcf_file,
+#                                            panel_file = self$ldabase$panel_file)
+#       invisible(self$data)
+#     }
+#   )
+# )
+#
+# LDAanalysis1 <- R6Class("LDAanalysis1",
+#                         public = list(
+#                           lda_import = NULL,
+#                           lead_snps = NULL,
+#                           cutoff = NULL,
+#                           rsquared = NULL,
+#                           results = NULL,
+#                           initialize = function(lead_snps = NA, cutoff = 0.8, lda_import = NA){
+#                             self$lda_import <- lda_import
+#                             self$lead_snps <- lead_snps
+#                             self$cutoff <- cutoff
+#                           },
+#                           set_rsquared = function(){
+#                             cat(paste0("Calculating R squared.\n"))
+#                             self$rsquared <- Filter(function(x) {!is.null(x)}, llply(self$lda_import, function(x){
+#                               calculateLD(lead_snps = lead_snps, xSnpMatrix = x$genotype)
+#                             }))
+#                             invisible(self$rsquared)
+#                           },
+#                           set_results = function(){
+#                             cat(paste0("Finding HighLD intervals.\n"))
+#                             self$results <- Reduce(c, llply(names(self$rsquared), function(y){
+#                               identifyHighLD(rsquared = self$rsquared[[y]], info = self$lda_import[[y]]$info, cutoff = self$cutoff,
+#                                              population = y)}))
+#                             invisible(self$results)
+#                           }
+#                         ))
 
 
 lead_snps_gr<-GRanges(snpsById(SNPlocs.Hsapiens.dbSNP144.GRCh37,lead_snps))
@@ -129,8 +129,8 @@ results <- llply(analysis_intervals_gr,function(x){
   ldaimports <- LDAImport$new(ldabase = ldabase, granges = x, populations = populations)$set_data()
   ldaanalysis1 <- LDAanalysis1$new(lead_snps = lead_snps, cutoff = 0.8, lda_import = ldaimports)
   ldaanalysis1$set_rsquared()
-  ldaanalysis1$set_results()
-  ldaanalysis1$results
+  #ldaanalysis1$set_results()
+  #ldaanalysis1$results
 },.parallel = T)
 names(results) <- paste(paste(analysis_intervals_gr))
 
@@ -150,7 +150,7 @@ lead_snps<-c("rs79997038","rs79084855","rs560426","rs66515264","rs751399","rs104
              "rs1536895")
 
 ldabase <- LDABase$new(file_path="/scratch/jfalck/1000G")
-ldaimports <- LDAImport$new(ldabase = ldabase, granges = analysis_intervals_gr[5], populations = populations)$set_data()
+ldaimports <- LDAImport$new(ldabase = ldabase, granges = analysis_intervals_gr[11], populations = populations)$set_data()
 ldaanalysis1 <- LDAanalysis1$new(lead_snps = lead_snps, cutoff = 0.8, lda_import = ldaimports)
 ldaanalysis1$set_rsquared()
 ldaanalysis1$set_results()
