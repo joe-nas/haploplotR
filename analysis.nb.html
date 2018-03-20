@@ -173,136 +173,118 @@ $(document).ready(function () {
 
 
 <!-- rnb-text-begin -->
-<p>Setting up the analysis dependencies are loaded and SNP and populations to be analysed are defined. Furthermore, paths to 1000Genomes vcf and tbi files are set, as well as to the panel file.</p>
+<p>First a number of required packages are loaded and the haploplotR package is installed.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGV2dG9vbHM6Omluc3RhbGxfZ2l0aHViKHJlcG8gPSBcImpvZS1uYXMvaGFwbG9wbG90UlwiKVxuXG5gYGAifQ== -->
-<pre class="r"><code>devtools::install_github(repo = &quot;joe-nas/haploplotR&quot;)
-</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjpbImxpYnJhcnkoZGV2dG9vbHMpIiwibGlicmFyeShHZW5vbWljUmFuZ2VzKSIsImxpYnJhcnkoZ3JpZCkiLCJsaWJyYXJ5KFR4RGIuSHNhcGllbnMuVUNTQy5oZzE5Lmtub3duR2VuZSkiLCJsaWJyYXJ5KFNOUGxvY3MuSHNhcGllbnMuZGJTTlAxNDQuR1JDaDM3KSIsImxpYnJhcnkoSG9tby5zYXBpZW5zKSIsImxpYnJhcnkoZG9NQykiLCJsaWJyYXJ5KHBseXIpIiwicmVnaXN0ZXJEb01DKGNvcmVzID0gNCkgIyBUaGUgbnVtYmVyIG9mIGNwdS1jb3JlcyB1c2VkIGluIHRoZSBhbmFseXNpcyIsIiIsImRldnRvb2xzOjppbnN0YWxsX2dpdGh1YihyZXBvID0gXCJqb2UtbmFzL2hhcGxvcGxvdFJcIikiLCJkZXZ0b29sczo6bG9hZF9hbGwoKSJdfQ== -->
+<pre class="r"><code>library(devtools)
+library(GenomicRanges)
+library(grid)
+library(TxDb.Hsapiens.UCSC.hg19.knownGene)
+library(SNPlocs.Hsapiens.dbSNP144.GRCh37)
+library(Homo.sapiens)
+library(doMC)
+library(plyr)
+registerDoMC(cores = 4) # The number of cpu-cores used in the analysis
+
+devtools::install_github(repo = &quot;joe-nas/haploplotR&quot;)
+devtools::load_all()</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiKiBpbnN0YWxsaW5nICpzb3VyY2UqIHBhY2thZ2Ug4oCYaGFwbG9wbG90UuKAmSAuLi5cbioqIGxpYnNcbiJ9 -->
-<pre><code>* installing *source* package ‘haploplotR’ ...
-** libs</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiZysrICAtSS91c3IvaW5jbHVkZS9SLyAtRE5ERUJVRyAgLUlcIi9ob21lL1NTRC1EYXRhL1IveDg2XzY0LXBjLWxpbnV4LWdudS1saWJyYXJ5LzMuNC9SY3BwL2luY2x1ZGVcIiAtRF9GT1JUSUZZX1NPVVJDRT0yICAgLWZwaWMgIC1tYXJjaD14ODYtNjQgLW10dW5lPWdlbmVyaWMgLU8yIC1waXBlIC1mc3RhY2stcHJvdGVjdG9yLXN0cm9uZyAtZm5vLXBsdCAgLWMgUmNwcEV4cG9ydHMuY3BwIC1vIFJjcHBFeHBvcnRzLm9cbmcrKyAgLUkvdXNyL2luY2x1ZGUvUi8gLUROREVCVUcgIC1JXCIvaG9tZS9TU0QtRGF0YS9SL3g4Nl82NC1wYy1saW51eC1nbnUtbGlicmFyeS8zLjQvUmNwcC9pbmNsdWRlXCIgLURfRk9SVElGWV9TT1VSQ0U9MiAgIC1mcGljICAtbWFyY2g9eDg2LTY0IC1tdHVuZT1nZW5lcmljIC1PMiAtcGlwZSAtZnN0YWNrLXByb3RlY3Rvci1zdHJvbmcgLWZuby1wbHQgIC1jIHNldFlDb29yZHMuY3BwIC1vIHNldFlDb29yZHMub1xuZysrICAtSS91c3IvaW5jbHVkZS9SLyAtRE5ERUJVRyAgLUlcIi9ob21lL1NTRC1EYXRhL1IveDg2XzY0LXBjLWxpbnV4LWdudS1saWJyYXJ5LzMuNC9SY3BwL2luY2x1ZGVcIiAtRF9GT1JUSUZZX1NPVVJDRT0yICAgLWZwaWMgIC1tYXJjaD14ODYtNjQgLW10dW5lPWdlbmVyaWMgLU8yIC1waXBlIC1mc3RhY2stcHJvdGVjdG9yLXN0cm9uZyAtZm5vLXBsdCAgLWMgdG9SYXdTbnBNYXQuY3BwIC1vIHRvUmF3U25wTWF0Lm9cbmcrKyAtc2hhcmVkIC1ML3Vzci9saWI2NC9SL2xpYiAtV2wsLU8xLC0tc29ydC1jb21tb24sLS1hcy1uZWVkZWQsLXoscmVscm8sLXosbm93IC1vIGhhcGxvcGxvdFIuc28gUmNwcEV4cG9ydHMubyBzZXRZQ29vcmRzLm8gdG9SYXdTbnBNYXQubyAtTC91c3IvbGliNjQvUi9saWIgLWxSXG4ifQ== -->
-<pre><code>g++  -I/usr/include/R/ -DNDEBUG  -I&quot;/home/SSD-Data/R/x86_64-pc-linux-gnu-library/3.4/Rcpp/include&quot; -D_FORTIFY_SOURCE=2   -fpic  -march=x86-64 -mtune=generic -O2 -pipe -fstack-protector-strong -fno-plt  -c RcppExports.cpp -o RcppExports.o
-g++  -I/usr/include/R/ -DNDEBUG  -I&quot;/home/SSD-Data/R/x86_64-pc-linux-gnu-library/3.4/Rcpp/include&quot; -D_FORTIFY_SOURCE=2   -fpic  -march=x86-64 -mtune=generic -O2 -pipe -fstack-protector-strong -fno-plt  -c setYCoords.cpp -o setYCoords.o
-g++  -I/usr/include/R/ -DNDEBUG  -I&quot;/home/SSD-Data/R/x86_64-pc-linux-gnu-library/3.4/Rcpp/include&quot; -D_FORTIFY_SOURCE=2   -fpic  -march=x86-64 -mtune=generic -O2 -pipe -fstack-protector-strong -fno-plt  -c toRawSnpMat.cpp -o toRawSnpMat.o
-g++ -shared -L/usr/lib64/R/lib -Wl,-O1,--sort-common,--as-needed,-z,relro,-z,now -o haploplotR.so RcppExports.o setYCoords.o toRawSnpMat.o -L/usr/lib64/R/lib -lR</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiaW5zdGFsbGluZyB0byAvaG9tZS9TU0QtRGF0YS9SL3g4Nl82NC1wYy1saW51eC1nbnUtbGlicmFyeS8zLjQvaGFwbG9wbG90Ui9saWJzXG4qKiBSXG4qKiBwcmVwYXJpbmcgcGFja2FnZSBmb3IgbGF6eSBsb2FkaW5nXG5FcnJvciBpbiBSNkNsYXNzKFwiTERBQmFzZVwiLCBwdWJsaWMgPSBsaXN0KGxlYWRfc25wcyA9IE5VTEwsIHBvcHVsYXRpb25zID0gTlVMTCwgIDogXG4gIGNvdWxkIG5vdCBmaW5kIGZ1bmN0aW9uIFwiUjZDbGFzc1wiXG5FcnJvciA6IHVuYWJsZSB0byBsb2FkIFIgY29kZSBpbiBwYWNrYWdlIOKAmGhhcGxvcGxvdFLigJlcbkVSUk9SOiBsYXp5IGxvYWRpbmcgZmFpbGVkIGZvciBwYWNrYWdlIOKAmGhhcGxvcGxvdFLigJlcbiogcmVtb3Zpbmcg4oCYL2hvbWUvU1NELURhdGEvUi94ODZfNjQtcGMtbGludXgtZ251LWxpYnJhcnkvMy40L2hhcGxvcGxvdFLigJlcbiogcmVzdG9yaW5nIHByZXZpb3VzIOKAmC9ob21lL1NTRC1EYXRhL1IveDg2XzY0LXBjLWxpbnV4LWdudS1saWJyYXJ5LzMuNC9oYXBsb3Bsb3RS4oCZXG4ifQ== -->
-<pre><code>installing to /home/SSD-Data/R/x86_64-pc-linux-gnu-library/3.4/haploplotR/libs
-** R
-** preparing package for lazy loading
-Error in R6Class(&quot;LDABase&quot;, public = list(lead_snps = NULL, populations = NULL,  : 
-  could not find function &quot;R6Class&quot;
-Error : unable to load R code in package ‘haploplotR’
-ERROR: lazy loading failed for package ‘haploplotR’
-* removing ‘/home/SSD-Data/R/x86_64-pc-linux-gnu-library/3.4/haploplotR’
-* restoring previous ‘/home/SSD-Data/R/x86_64-pc-linux-gnu-library/3.4/haploplotR’</code></pre>
-<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>Next information about SNPs is gathered from dbSNP144 and stored as lead_snps_gr. Then, 650Kb intervals are created around the lead_SNPs_gr creating analysis_intervals_gr. Furthermore, both objects are modified to have a common format corresponding to UCSC standart.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYW5hbHlzaXNfaW50ZXJ2YWxzX2dyIDwtIHJlc2l6ZShHUmFuZ2VzKGxlYWRfc25wc19ncCksIGZpeCA9ICdjZW50ZXInLCB3aWR0aCA9IDYuNWU1KSkpXG5cbmBgYCJ9 -->
-<pre class="r"><code>analysis_intervals_gr &lt;- resize(GRanges(lead_snps_gp), fix = 'center', width = 6.5e5)))
-</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjpbImxlYWRfc25wcyA8LSByZWFkLnRhYmxlKFwifi8uLi9TdG9yYWdlL0RvY3VtZW50cy9UaGVzaXMxL3NlY3Rpb25fcmVzdWx0cy90YWJsZXMvbGVhZF9zbnBzLmNzdlwiLCBoZWFkZXIgPSBULCBzdHJpbmdzQXNGYWN0b3JzID0gRikkbGVhZC5TTlBzIiwicG9wdWxhdGlvbnMgPC0gcmVhZC50YWJsZShcIn4vLi4vU3RvcmFnZS9Eb2N1bWVudHMvVGhlc2lzMS9zZWN0aW9uX2FwcGVuZGl4L3RhYmxlcy8xMDAwR2Vub21lc19wb3B1bGF0aW9ucy5jc3ZcIiwgaGVhZGVyID0gVCwgc3RyaW5nc0FzRmFjdG9ycyA9IEYsIHNlcCA9IFwiLFwiKSRDb2RlIiwiIiwibGVhZF9zbnBzX2dyIDwtIEdSYW5nZXMoc25wc0J5SWQoU05QbG9jcy5Ic2FwaWVucy5kYlNOUDE0NC5HUkNoMzcsIGxlYWRfc25wcykpIiwiYW5hbHlzaXNfaW50ZXJ2YWxzX2dyIDwtIHJlc2l6ZShsZWFkX3NucHNfZ3IsIGZpeCA9ICdjZW50ZXInLCB3aWR0aCA9IDYuNWU1KSIsInNlcWxldmVsc1N0eWxlKGxlYWRfc25wc19ncikgPC0gXCJVQ1NDXCIiLCJzZXFsZXZlbHNTdHlsZShhbmFseXNpc19pbnRlcnZhbHNfZ3IpIDwtIFwiVUNTQ1wiIiwiZ2Vub21lKGxlYWRfc25wc19ncikgPC0gTkEiLCJnZW5vbWUoYW5hbHlzaXNfaW50ZXJ2YWxzX2dyKSA8LSBOQSJdfQ== -->
+<pre class="r"><code>lead_snps &lt;- read.table(&quot;~/../Storage/Documents/Thesis1/section_results/tables/lead_snps.csv&quot;, header = T, stringsAsFactors = F)$lead.SNPs
+populations &lt;- read.table(&quot;~/../Storage/Documents/Thesis1/section_appendix/tables/1000Genomes_populations.csv&quot;, header = T, stringsAsFactors = F, sep = &quot;,&quot;)$Code
+
+lead_snps_gr &lt;- GRanges(snpsById(SNPlocs.Hsapiens.dbSNP144.GRCh37, lead_snps))
+analysis_intervals_gr &lt;- resize(lead_snps_gr, fix = 'center', width = 6.5e5)
+seqlevelsStyle(lead_snps_gr) &lt;- &quot;UCSC&quot;
+seqlevelsStyle(analysis_intervals_gr) &lt;- &quot;UCSC&quot;
+genome(lead_snps_gr) &lt;- NA
+genome(analysis_intervals_gr) &lt;- NA</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiRXJyb3I6IHVuZXhwZWN0ZWQgJyknIGluIFwiYW5hbHlzaXNfaW50ZXJ2YWxzX2dyIDwtIHJlc2l6ZShHUmFuZ2VzKGxlYWRfc25wc19ncCksIGZpeCA9ICdjZW50ZXInLCB3aWR0aCA9IDYuNWU1KSlcIlxuIn0= -->
-<pre><code>Error: unexpected ')' in &quot;analysis_intervals_gr &lt;- resize(GRanges(lead_snps_gp), fix = 'center', width = 6.5e5))&quot;</code></pre>
-<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>Given lead_snps_gr and analysis_intervals_gr we can now import 1000Genomes haplotype data to calculate linkage disequilibrium from lead-SNPs to the 1000Genomes variants. Here we use the haploplotR package to import 1000Genomes for data.</p>
+<p>Given lead_snps_gr and analysis_intervals_gr we can now import 1000Genomes haplotype data to calculate linkage disequilibrium from lead-SNPs to the 1000Genomes variants. Here we use the haploplotR package to import 1000Genomes for data. First I’ll show the pipeline with limited genomic locations and populations followed by an analysis of multiple genomic locations and lastly the complete analysis (commented out for practical reasons). The latter run will recreate the actual results.</p>
+<div id="one-genomic-location-3-populations" class="section level4">
+<h4>One genomic location 3 populations</h4>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShkb01DKVxuXG5gYGAifQ== -->
-<pre class="r"><code>library(doMC)
-</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjpbIiMgVGhpcyBpcyB0aGUgZm9sZGVyIHdoZXJlIDEwMDBHIGRhdGEgbGl2ZXMiLCJsZGFiYXNlIDwtIExEQUJhc2UkbmV3KGZpbGVfcGF0aCA9IFwiL2hvbWUvU1NELURhdGEvMTAwMEdlbm9tZXMvXCIpIiwiIiwiIyBUaGlzIHNldHMgdXAgYW4gb2JqZWN0IHNwZWNpZnlpbmcgdGhlIGFuYWx5c2lzIGludGVydmFsIGFuZCB3aGljaCBwb3B1bGF0aW9ucyBhcmUgdG8gYmUgYW5hbHl6ZWQiLCJsZGFpbXBvcnQgPC0gTERBSW1wb3J0JG5ldyhsZGFiYXNlID0gbGRhYmFzZSwgZ3JhbmdlcyA9ICBhbmFseXNpc19pbnRlcnZhbHNfZ3JbMV0sIHBvcHVsYXRpb25zID0gYyhcIkNFVVwiLFwiQ0hCXCIsXCJKUFRcIikpIiwiIiwiIyBUaGlzIGltcG9ydHMgdGhlIGRhdGEiLCJsZGFpbXBvcnQkc2V0X2RhdGEoKSIsIiIsIiMgSGVyZSB0aGUgaW1wb3J0ZWQgZGF0YSBpcyBhc3NvY2lhdGVkIHdpdGggdGhlIGFuYWx5c2lzMSBwaXBlbGluZSIsInJlczEgPC0gTERBYW5hbHlzaXMxJG5ldyhsZWFkX3NucHMgPSBsZWFkX3NucHMsIGN1dG9mZiA9IDAuOCwgbGRhX2ltcG9ydCA9IGxkYWltcG9ydCkiLCIiLCIjIyBORUVEUyBUTyBCRSBERUJVR0dFRCAuLi4gZG9lcyBub3Qgd29yayB3aXRoIG9ubHkgb25lIGFuYWx5c2lzIGludGVydmFsIiwicmVzMSRzZXRfcnNxdWFyZWQoKSJdfQ== -->
+<pre class="r"><code># This is the folder where 1000G data lives
+ldabase &lt;- LDABase$new(file_path = &quot;/home/SSD-Data/1000Genomes/&quot;)
+
+# This sets up an object specifying the analysis interval and which populations are to be analyzed
+ldaimport &lt;- LDAImport$new(ldabase = ldabase, granges =  analysis_intervals_gr[1], populations = c(&quot;CEU&quot;,&quot;CHB&quot;,&quot;JPT&quot;))
+
+# This imports the data
+ldaimport$set_data()
+
+# Here the imported data is associated with the analysis1 pipeline
+res1 &lt;- LDAanalysis1$new(lead_snps = lead_snps, cutoff = 0.8, lda_import = ldaimport)
+
+## NEEDS TO BE DEBUGGED ... does not work with only one analysis interval
+res1$set_rsquared()</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiTG9hZGluZyByZXF1aXJlZCBwYWNrYWdlOiBmb3JlYWNoXG5Mb2FkaW5nIHJlcXVpcmVkIHBhY2thZ2U6IGl0ZXJhdG9yc1xuIn0= -->
-<pre><code>Loading required package: foreach
-Loading required package: iterators</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShwbHlyKVxuYGBgIn0= -->
-<pre class="r"><code>library(plyr)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiXG5BdHRhY2hpbmcgcGFja2FnZTog4oCYcGx5cuKAmVxuXG5UaGUgZm9sbG93aW5nIG9iamVjdCBpcyBtYXNrZWQgZnJvbSDigJhwYWNrYWdlOlhWZWN0b3LigJk6XG5cbiAgICBjb21wYWN0XG5cblRoZSBmb2xsb3dpbmcgb2JqZWN0IGlzIG1hc2tlZCBmcm9tIOKAmHBhY2thZ2U6SVJhbmdlc+KAmTpcblxuICAgIGRlc2NcblxuVGhlIGZvbGxvd2luZyBvYmplY3QgaXMgbWFza2VkIGZyb20g4oCYcGFja2FnZTpTNFZlY3RvcnPigJk6XG5cbiAgICByZW5hbWVcbiJ9 -->
-<pre><code>
-Attaching package: ‘plyr’
-
-The following object is masked from ‘package:XVector’:
-
-    compact
-
-The following object is masked from ‘package:IRanges’:
-
-    desc
-
-The following object is masked from ‘package:S4Vectors’:
-
-    rename</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGV2dG9vbHM6OmxvYWRfYWxsKCcvaG9tZS9TU0QtRGF0YS9Qcm9qZWN0cy9oYXBsb3Bsb3RSLycpXG5gYGAifQ== -->
-<pre class="r"><code>devtools::load_all('/home/SSD-Data/Projects/haploplotR/')</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiTG9hZGluZyBoYXBsb3Bsb3RSXG4ifQ== -->
-<pre><code>Loading haploplotR</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucmVnaXN0ZXJEb01DKGNvcmVzID0gMilcblRHRGF0YSA8LSBsbHBseShhbmFseXNpc19pbnRlcnZhbHNfZ3IsIGZ1bmN0aW9uKHgpe1xuICBnciA8LSB4ICMgbG9jYXRpb24gd2hlcmUgcnN1YXJlZCBpcyBjYWxjdWxhdGVkXG4gIGRhdGEgPC0gaW1wb3J0MTAwMEdEYXRhKHdoZXJlID0geCwgd2hpY2ggPSBwb3B1bGF0aW9ucywgdmNmX2ZpbGUgPSB2Y2ZmaWxlLCBwYW5lbF9maWxlID0gcGFuZWxmaWxlKSAjIDEwMDBHIGRhdGFcbiAgcnNxdWFyZWQgPC0gbGxwbHkoZGF0YSwgZnVuY3Rpb24oZGF0KSBjYWxjdWxhdGVMRChsZWFkX3NucHMsZGF0JGdlbm90eXBlKSkgIyBycyBmb3IgZ2l2ZW4gcG9wdWxhdGlvbiBhbmQgbGVhZF9zbnBzXG4gIGxpc3QoZ3IgPSBnciwgZGF0YSA9IGRhdGEsIHJzcXVhcmVkID0gcnNxdWFyZWQpICMgcmV0dXJuIGFsbCB0aGUgZGF0YSBhcyBsaXN0XG59LCAucGFyYWxsZWwgPSBUUlVFKVxuYGBgIn0= -->
-<pre class="r"><code>registerDoMC(cores = 2)
-TGData &lt;- llply(analysis_intervals_gr, function(x){
-  gr &lt;- x # location where rsuared is calculated
-  data &lt;- import1000GData(where = x, which = populations, vcf_file = vcffile, panel_file = panelfile) # 1000G data
-  rsquared &lt;- llply(data, function(dat) calculateLD(lead_snps,dat$genotype)) # rs for given population and lead_snps
-  list(gr = gr, data = data, rsquared = rsquared) # return all the data as list
-}, .parallel = TRUE)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiTG9hZGluZyByZXF1aXJlZCBwYWNrYWdlOiBzbnBTdGF0c1xuTG9hZGluZyByZXF1aXJlZCBwYWNrYWdlOiBzdXJ2aXZhbFxuTG9hZGluZyByZXF1aXJlZCBwYWNrYWdlOiBNYXRyaXhcblxuQXR0YWNoaW5nIHBhY2thZ2U6ICdNYXRyaXgnXG5cblRoZSBmb2xsb3dpbmcgb2JqZWN0IGlzIG1hc2tlZCBmcm9tICdwYWNrYWdlOlM0VmVjdG9ycyc6XG5cbiAgICBleHBhbmRcblxuTG9hZGluZyByZXF1aXJlZCBwYWNrYWdlOiBzbnBTdGF0c1xuTG9hZGluZyByZXF1aXJlZCBwYWNrYWdlOiBzdXJ2aXZhbFxuTG9hZGluZyByZXF1aXJlZCBwYWNrYWdlOiBNYXRyaXhcblxuQXR0YWNoaW5nIHBhY2thZ2U6ICdNYXRyaXgnXG5cblRoZSBmb2xsb3dpbmcgb2JqZWN0IGlzIG1hc2tlZCBmcm9tICdwYWNrYWdlOlM0VmVjdG9ycyc6XG5cbiAgICBleHBhbmRcbiJ9 -->
-<pre><code>Loading required package: snpStats
-Loading required package: survival
-Loading required package: Matrix
-
-Attaching package: 'Matrix'
-
-The following object is masked from 'package:S4Vectors':
-
-    expand
-
-Loading required package: snpStats
-Loading required package: survival
-Loading required package: Matrix
-
-Attaching package: 'Matrix'
-
-The following object is masked from 'package:S4Vectors':
-
-    expand</code></pre>
-<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>Given the imported data we can now use the identifyHighLD function to find SNPs in high LD (R^2) with the lead-SNPs and to identify tag-SNP intervals.</p>
+</div>
+<div id="two-genomic-location-3-populations" class="section level4">
+<h4>Two genomic location 3 populations</h4>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucmVzdWx0cyA8LSBsbHBseShUR0RhdGEsIGZ1bmN0aW9uKHgpeyAjIyBsb29wIG92ZXIgdGhlIGltcG9ydGVkIDEwMDBHIGRhdGFcbiAgUmVkdWNlKGMsbGxwbHkocG9wdWxhdGlvbnMsIGZ1bmN0aW9uKHkpeyAjIyBsb29wIG92ZXIgcG9wdWxhdGlvbnMsIGNhbGN1bGF0ZSBMRCBldGMgYW5kIGdlbmVyYXRlIHJlc3VsdHMuXG4gICAgaWRlbnRpZnlIaWdoTEQocnNxdWFyZWQgPSB4JHJzcXVhcmVkW1t5XV0sIHgkZGF0YVtbeV1dJGluZm8sIHBvcHVsYXRpb24gPSB5KVxuICB9KSlcbn0pXG5cbmBgYCJ9 -->
-<pre class="r"><code>results &lt;- llply(TGData, function(x){ ## loop over the imported 1000G data
-  Reduce(c,llply(populations, function(y){ ## loop over populations, calculate LD etc and generate results.
-    identifyHighLD(rsquared = x$rsquared[[y]], x$data[[y]]$info, population = y)
-  }))
-})
-</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjpbIiMgVGhpcyBpcyB0aGUgZm9sZGVyIHdoZXJlIDEwMDBHIGRhdGEgbGl2ZXMiLCJsZGFiYXNlIDwtIExEQUJhc2UkbmV3KGZpbGVfcGF0aCA9IFwiL2hvbWUvU1NELURhdGEvMTAwMEdlbm9tZXMvXCIpIiwiIiwiIyBUaGlzIHNldHMgdXAgYW4gb2JqZWN0IHNwZWNpZnlpbmcgdGhlIGFuYWx5c2lzIGludGVydmFsIGFuZCB3aGljaCBwb3B1bGF0aW9ucyBhcmUgdG8gYmUgYW5hbHl6ZWQiLCJyZXMyIDwtIGxscGx5KGFuYWx5c2lzX2ludGVydmFsc19nclsxOjJdLCBmdW5jdGlvbih4KXsiLCIgIGRhdCA8LSBMREFJbXBvcnQkbmV3KGxkYWJhc2UgPSBsZGFiYXNlLCBncmFuZ2VzID0gIHgsIHBvcHVsYXRpb25zID0gYyhcIkNFVVwiLFwiQ0hCXCIsXCJKUFRcIikpJHNldF9kYXRhKCkiLCIgIHJlcyA8LSBMREFhbmFseXNpczEkbmV3KGxlYWRfc25wcyA9IGxlYWRfc25wcywgY3V0b2ZmID0gMC44LCBsZGFfaW1wb3J0ID0gZGF0KSIsIiAgcmVzJHNldF9yc3F1YXJlZCgpIiwiICByZXMkc2V0X3Jlc3VsdHMoKSIsIiAgaW52aXNpYmxlKHJlcykiLCJ9LCAucGFyYWxsZWwgPSBUKSIsIiIsIiMgdGhpcyBjb2xsZWN0cyB0YWcgc25wIGludGVydmFscyBmcm9tIG11bHRpcGxlIHJlZ2lvbnMgaW50byBvbmUgb2JqZWN0IiwiaGlnaF9sZDIgPC0gUmVkdWNlKGMsTWFwKGZ1bmN0aW9uKHgpIHgkcmVzdWx0cywgcmVzMikpIl19 -->
+<pre class="r"><code># This is the folder where 1000G data lives
+ldabase &lt;- LDABase$new(file_path = &quot;/home/SSD-Data/1000Genomes/&quot;)
+
+# This sets up an object specifying the analysis interval and which populations are to be analyzed
+res2 &lt;- llply(analysis_intervals_gr[1:2], function(x){
+  dat &lt;- LDAImport$new(ldabase = ldabase, granges =  x, populations = c(&quot;CEU&quot;,&quot;CHB&quot;,&quot;JPT&quot;))$set_data()
+  res &lt;- LDAanalysis1$new(lead_snps = lead_snps, cutoff = 0.8, lda_import = dat)
+  res$set_rsquared()
+  res$set_results()
+  invisible(res)
+}, .parallel = T)
+
+# this collects tag snp intervals from multiple regions into one object
+high_ld2 &lt;- Reduce(c,Map(function(x) x$results, res2))</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoibnVtYmVyIG9mIGl0ZW1zIHRvIHJlcGxhY2UgaXMgbm90IGEgbXVsdGlwbGUgb2YgcmVwbGFjZW1lbnQgbGVuZ3RoRXJyb3IgaW4gLkNhbGwyKFwic29sdmVfdXNlcl9TRVcwXCIsIHN0YXJ0LCBlbmQsIHdpZHRoLCBQQUNLQUdFID0gXCJJUmFuZ2VzXCIpIDogXG4gIHNvbHZpbmcgcm93IDE6IG5lZ2F0aXZlIHdpZHRocyBhcmUgbm90IGFsbG93ZWRcbiJ9 -->
-<pre><code>number of items to replace is not a multiple of replacement lengthError in .Call2(&quot;solve_user_SEW0&quot;, start, end, width, PACKAGE = &quot;IRanges&quot;) : 
-  solving row 1: negative widths are not allowed</code></pre>
-<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="complete-analysis-91-genomic-regions-and-26-populations" class="section level4">
+<h4>Complete analysis: 91 genomic regions and, 26 populations</h4>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjpbIiMgVGhpcyBpcyB0aGUgZm9sZGVyIHdoZXJlIDEwMDBHIGRhdGEgbGl2ZXMiLCJsZGFiYXNlIDwtIExEQUJhc2UkbmV3KGZpbGVfcGF0aCA9IFwiL2hvbWUvU1NELURhdGEvMTAwMEdlbm9tZXMvXCIpIiwicHJpbnQocG9wdWxhdGlvbnMpIiwicHJpbnQobGVhZF9zbnBzKSIsInByaW50KGFuYWx5c2lzX2ludGVydmFsc19ncikiLCIiLCIjIyBXQVJOSU5HOiB0aGlzIHNob3VsZCBiZXR0ZXIgbm90IGJlIGV4ZWN1dGVkIG9uIGEgZGVza3RvcCBQQyB1bmxlc3MgeW91IGhhdmUgZW5vdWdoIG1lbW9yeS4iLCIjIHJlZ2lzdGVyRG9NQyhjb3JlcyA9IDE0KSIsIiMgVGhpcyBzZXRzIHVwIGFuIG9iamVjdCBzcGVjaWZ5aW5nIHRoZSBhbmFseXNpcyBpbnRlcnZhbCBhbmQgd2hpY2ggcG9wdWxhdGlvbnMgYXJlIHRvIGJlIGFuYWx5emVkIiwiIyByZXNfY29tcGxldGUgPC0gbGxwbHkoYW5hbHlzaXNfaW50ZXJ2YWxzX2dyLCBmdW5jdGlvbih4KXsiLCIjICAgZGF0IDwtIExEQUltcG9ydCRuZXcobGRhYmFzZSA9IGxkYWJhc2UsIGdyYW5nZXMgPSAgeCwgcG9wdWxhdGlvbnMgPSBwb3B1bGF0aW9ucykkc2V0X2RhdGEoKSIsIiMgICByZXMgPC0gTERBYW5hbHlzaXMxJG5ldyhsZWFkX3NucHMgPSBsZWFkX3NucHMsIGN1dG9mZiA9IDAuOCwgbGRhX2ltcG9ydCA9IGRhdCkiLCIjICAgcmVzJHNldF9yc3F1YXJlZCgpIiwiIyAgIHJlcyRzZXRfcmVzdWx0cygpIiwiIyAgIGludmlzaWJsZShyZXMpIiwiIyB9LCAucGFyYWxsZWwgPSBUKSIsIiMgIiwiIyBoaWdoX2xkX2NvbXBsZXRlIDwtIFJlZHVjZShjLE1hcChmdW5jdGlvbih4KSB4JHJlc3VsdHMsIHJlc19jb21wbGV0ZSkpIl19 -->
+<pre class="r"><code># This is the folder where 1000G data lives
+ldabase &lt;- LDABase$new(file_path = &quot;/home/SSD-Data/1000Genomes/&quot;)
+print(populations)
+print(lead_snps)
+print(analysis_intervals_gr)
+
+## WARNING: this should better not be executed on a desktop PC unless you have enough memory.
+# registerDoMC(cores = 14)
+# This sets up an object specifying the analysis interval and which populations are to be analyzed
+# res_complete &lt;- llply(analysis_intervals_gr, function(x){
+#   dat &lt;- LDAImport$new(ldabase = ldabase, granges =  x, populations = populations)$set_data()
+#   res &lt;- LDAanalysis1$new(lead_snps = lead_snps, cutoff = 0.8, lda_import = dat)
+#   res$set_rsquared()
+#   res$set_results()
+#   invisible(res)
+# }, .parallel = T)
+# 
+# high_ld_complete &lt;- Reduce(c,Map(function(x) x$results, res_complete))</code></pre>
+<!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
+</div>
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiQW5hbHlzaXMgQXBwcm9hY2ggMSIKb3V0cHV0OgogIGh0bWxfZG9jdW1lbnQ6CiAgICBkZl9wcmludDogcGFnZWQKICBodG1sX25vdGVib29rOiBkZWZhdWx0CiAgcGRmX2RvY3VtZW50OiBkZWZhdWx0Ci0tLQoKU2V0dGluZyB1cCB0aGUgYW5hbHlzaXMgZGVwZW5kZW5jaWVzIGFyZSBsb2FkZWQgYW5kIFNOUCBhbmQgcG9wdWxhdGlvbnMgdG8gYmUgYW5hbHlzZWQgYXJlIGRlZmluZWQuIEZ1cnRoZXJtb3JlLCBwYXRocyB0byAxMDAwR2Vub21lcyB2Y2YgYW5kIHRiaSBmaWxlcyBhcmUgc2V0LCBhcyB3ZWxsIGFzIHRvIHRoZSBwYW5lbCBmaWxlLgoKCmBgYHtyIFNldHRpbmcgdXAgdGhlIGVudmlyb25tZW50LCBlY2hvPVRSVUUsIG1lc3NhZ2U9RkFMU0UsIHdhcm5pbmc9RkFMU0UsIHBhZ2VkLnByaW50PUZBTFNFfQpsaWJyYXJ5KGRldnRvb2xzKQpsaWJyYXJ5KEdlbm9taWNSYW5nZXMpCmxpYnJhcnkoZ3JpZCkKbGlicmFyeShUeERiLkhzYXBpZW5zLlVDU0MuaGcxOS5rbm93bkdlbmUpCmxpYnJhcnkoU05QbG9jcy5Ic2FwaWVucy5kYlNOUDE0NC5HUkNoMzcpCmxpYnJhcnkoSG9tby5zYXBpZW5zKQpkZXZ0b29sczo6aW5zdGFsbF9naXRodWIocmVwbyA9ICJqb2UtbmFzL2hhcGxvcGxvdFIiKQpkZXZ0b29sczo6bG9hZF9hbGwoIi9wYXRoL3RvL2hhcGxvcGxvdFIiKQoKbGVhZF9zbnBzIDwtIHJlYWQudGFibGUoIn4vLi4vU3RvcmFnZS9Eb2N1bWVudHMvVGhlc2lzMS9zZWN0aW9uX3Jlc3VsdHMvdGFibGVzL2xlYWRfc25wcy5jc3YiLCBoZWFkZXIgPSBULCBzdHJpbmdzQXNGYWN0b3JzID0gRikkbGVhZC5TTlBzWzE6Ml0KcG9wdWxhdGlvbnMgPC0gcmVhZC50YWJsZSgifi8uLi9TdG9yYWdlL0RvY3VtZW50cy9UaGVzaXMxL3NlY3Rpb25fYXBwZW5kaXgvdGFibGVzLzEwMDBHZW5vbWVzX3BvcHVsYXRpb25zLmNzdiIsIGhlYWRlciA9IFQsIHN0cmluZ3NBc0ZhY3RvcnMgPSBGLCBzZXAgPSAiLCIpJENvZGUKCmxkYWJhc2UgPC0gTERBQmFzZSRuZXcoZmlsZV9wYXRoID0gIi9zY3JhdGNoL2pmYWxjay8xMDAwRyIpCmBgYAoKTmV4dCBpbmZvcm1hdGlvbiBhYm91dCBTTlBzIGlzIGdhdGhlcmVkIGZyb20gZGJTTlAxNDQgYW5kIHN0b3JlZCBhcyBsZWFkX3NucHNfZ3IuIFRoZW4sIDY1MEtiIGludGVydmFscyBhcmUgY3JlYXRlZCBhcm91bmQgdGhlIGxlYWRfU05Qc19nciBjcmVhdGluZyBhbmFseXNpc19pbnRlcnZhbHNfZ3IuIEZ1cnRoZXJtb3JlLCBib3RoIG9iamVjdHMgYXJlIG1vZGlmaWVkIHRvIGhhdmUgYSBjb21tb24gZm9ybWF0IGNvcnJlc3BvbmRpbmcgdG8gVUNTQyBzdGFuZGFydC4KCmBgYHtyfQpsZWFkX3NucHNfZ3IgPC0gR1JhbmdlcyhzbnBzQnlJZChTTlBsb2NzLkhzYXBpZW5zLmRiU05QMTQ0LkdSQ2gzNywgbGVhZF9zbnBzKSkKYW5hbHlzaXNfaW50ZXJ2YWxzX2dyIDwtIHJlc2l6ZShsZWFkX3NucHNfZ3IsIGZpeCA9ICdjZW50ZXInLCB3aWR0aCA9IDYuNWU1KQpzZXFsZXZlbHNTdHlsZShsZWFkX3NucHNfZ3IpIDwtICJVQ1NDIgpzZXFsZXZlbHNTdHlsZShhbmFseXNpc19pbnRlcnZhbHNfZ3IpIDwtICJVQ1NDIgpnZW5vbWUobGVhZF9zbnBzX2dyKSA8LSBOQQpnZW5vbWUoYW5hbHlzaXNfaW50ZXJ2YWxzX2dyKSA8LSBOQQpgYGAKCkdpdmVuIGxlYWRfc25wc19nciBhbmQgYW5hbHlzaXNfaW50ZXJ2YWxzX2dyIHdlIGNhbiBub3cgaW1wb3J0IDEwMDBHZW5vbWVzIGhhcGxvdHlwZSBkYXRhIHRvIGNhbGN1bGF0ZSBsaW5rYWdlIGRpc2VxdWlsaWJyaXVtIGZyb20gbGVhZC1TTlBzIHRvIHRoZSAxMDAwR2Vub21lcyB2YXJpYW50cy4gSGVyZSB3ZSB1c2UgdGhlIGhhcGxvcGxvdFIgcGFja2FnZSB0byBpbXBvcnQgMTAwMEdlbm9tZXMgZm9yIGRhdGEuCgpgYGB7ciBJbXBvcnQgZGF0YX0KbGlicmFyeShkb01DKQpsaWJyYXJ5KHBseXIpCgpkZXZ0b29sczo6bG9hZF9hbGwoJy9ob21lL1NTRC1EYXRhL1Byb2plY3RzL2hhcGxvcGxvdFIvJykKcmVnaXN0ZXJEb01DKGNvcmVzID0gMikKVEdEYXRhIDwtIGxscGx5KGFuYWx5c2lzX2ludGVydmFsc19nciwgZnVuY3Rpb24oeCl7CiAgZ3IgPC0geCAjIGxvY2F0aW9uIHdoZXJlIHJzdWFyZWQgaXMgY2FsY3VsYXRlZAogIGRhdGEgPC0gaW1wb3J0MTAwMEdEYXRhKHdoZXJlID0geCwgd2hpY2ggPSBwb3B1bGF0aW9ucywgdmNmX2ZpbGUgPSB2Y2ZmaWxlLCBwYW5lbF9maWxlID0gcGFuZWxmaWxlKSAjIDEwMDBHIGRhdGEKICByc3F1YXJlZCA8LSBsbHBseShkYXRhLCBmdW5jdGlvbihkYXQpIGNhbGN1bGF0ZUxEKGxlYWRfc25wcyxkYXQkZ2Vub3R5cGUpKSAjIHJzIGZvciBnaXZlbiBwb3B1bGF0aW9uIGFuZCBsZWFkX3NucHMKICBsaXN0KGdyID0gZ3IsIGRhdGEgPSBkYXRhLCByc3F1YXJlZCA9IHJzcXVhcmVkKSAjIHJldHVybiBhbGwgdGhlIGRhdGEgYXMgbGlzdAp9LCAucGFyYWxsZWwgPSBUUlVFKQpgYGAKR2l2ZW4gdGhlIGltcG9ydGVkIGRhdGEgd2UgY2FuIG5vdyB1c2UgdGhlIGlkZW50aWZ5SGlnaExEIGZ1bmN0aW9uIHRvIGZpbmQgU05QcyBpbiBoaWdoIExEIChSXjIpIHdpdGggdGhlIGxlYWQtU05QcyBhbmQgdG8gaWRlbnRpZnkgdGFnLVNOUCBpbnRlcnZhbHMuCgpgYGB7UiBDb21wdXRlIFJeMiBhbmQgZmluZCB0YWctU05QIGludGVydmFsc30KcmVzdWx0cyA8LSBsbHBseShUR0RhdGEsIGZ1bmN0aW9uKHgpeyAjIyBsb29wIG92ZXIgdGhlIGltcG9ydGVkIDEwMDBHIGRhdGEKICBSZWR1Y2UoYyxsbHBseShwb3B1bGF0aW9ucywgZnVuY3Rpb24oeSl7ICMjIGxvb3Agb3ZlciBwb3B1bGF0aW9ucywgY2FsY3VsYXRlIExEIGV0YyBhbmQgZ2VuZXJhdGUgcmVzdWx0cy4KICAgIGlkZW50aWZ5SGlnaExEKHJzcXVhcmVkID0geCRyc3F1YXJlZFtbeV1dLCB4JGRhdGFbW3ldXSRpbmZvLCBwb3B1bGF0aW9uID0geSkKICB9KSkKfSkKCm5hbWVzKHJlc3VsdHMpIDwtIFJlZHVjZShjLE1hcChmdW5jdGlvbih4KSBwYXN0ZSh4JGdyLHgkZ3IkUmVmU05QX2lkLCBzZXAgPSAiXyIpLCBUR0RhdGEpKQpgYGAKCg==</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiQW5hbHlzaXMgQXBwcm9hY2ggMSIKb3V0cHV0OgogIGh0bWxfZG9jdW1lbnQ6CiAgICBkZl9wcmludDogcGFnZWQKICBodG1sX25vdGVib29rOiBkZWZhdWx0CiAgcGRmX2RvY3VtZW50OiBkZWZhdWx0Ci0tLQoKRmlyc3QgYSBudW1iZXIgb2YgcmVxdWlyZWQgcGFja2FnZXMgYXJlIGxvYWRlZCBhbmQgdGhlIGhhcGxvcGxvdFIgcGFja2FnZSBpcyBpbnN0YWxsZWQuCmBgYHtyIFNldHRpbmcgdXAgdGhlIGVudmlyb25tZW50LCBldmFsPUZBTFNFLCBpbmNsdWRlPVR9CmxpYnJhcnkoZGV2dG9vbHMpCmxpYnJhcnkoR2Vub21pY1JhbmdlcykKbGlicmFyeShncmlkKQpsaWJyYXJ5KFR4RGIuSHNhcGllbnMuVUNTQy5oZzE5Lmtub3duR2VuZSkKbGlicmFyeShTTlBsb2NzLkhzYXBpZW5zLmRiU05QMTQ0LkdSQ2gzNykKbGlicmFyeShIb21vLnNhcGllbnMpCmxpYnJhcnkoZG9NQykKbGlicmFyeShwbHlyKQpyZWdpc3RlckRvTUMoY29yZXMgPSA0KSAjIFRoZSBudW1iZXIgb2YgY3B1LWNvcmVzIHVzZWQgaW4gdGhlIGFuYWx5c2lzCgpkZXZ0b29sczo6aW5zdGFsbF9naXRodWIocmVwbyA9ICJqb2UtbmFzL2hhcGxvcGxvdFIiKQpkZXZ0b29sczo6bG9hZF9hbGwoKQoKYGBgCgoKTmV4dCBpbmZvcm1hdGlvbiBhYm91dCBTTlBzIGlzIGdhdGhlcmVkIGZyb20gZGJTTlAxNDQgYW5kIHN0b3JlZCBhcyBsZWFkX3NucHNfZ3IuIFRoZW4sIDY1MEtiIGludGVydmFscyBhcmUgY3JlYXRlZCBhcm91bmQgdGhlIGxlYWRfU05Qc19nciBjcmVhdGluZyBhbmFseXNpc19pbnRlcnZhbHNfZ3IuIEZ1cnRoZXJtb3JlLCBib3RoIG9iamVjdHMgYXJlIG1vZGlmaWVkIHRvIGhhdmUgYSBjb21tb24gZm9ybWF0IGNvcnJlc3BvbmRpbmcgdG8gVUNTQyBzdGFuZGFydC4KYGBge3IgTG9hZGluZyBsZWFkX3NucHMsIGV2YWw9RkFMU0UsIGluY2x1ZGU9VH0KbGVhZF9zbnBzIDwtIHJlYWQudGFibGUoIn4vLi4vU3RvcmFnZS9Eb2N1bWVudHMvVGhlc2lzMS9zZWN0aW9uX3Jlc3VsdHMvdGFibGVzL2xlYWRfc25wcy5jc3YiLCBoZWFkZXIgPSBULCBzdHJpbmdzQXNGYWN0b3JzID0gRikkbGVhZC5TTlBzCnBvcHVsYXRpb25zIDwtIHJlYWQudGFibGUoIn4vLi4vU3RvcmFnZS9Eb2N1bWVudHMvVGhlc2lzMS9zZWN0aW9uX2FwcGVuZGl4L3RhYmxlcy8xMDAwR2Vub21lc19wb3B1bGF0aW9ucy5jc3YiLCBoZWFkZXIgPSBULCBzdHJpbmdzQXNGYWN0b3JzID0gRiwgc2VwID0gIiwiKSRDb2RlCgpsZWFkX3NucHNfZ3IgPC0gR1JhbmdlcyhzbnBzQnlJZChTTlBsb2NzLkhzYXBpZW5zLmRiU05QMTQ0LkdSQ2gzNywgbGVhZF9zbnBzKSkKYW5hbHlzaXNfaW50ZXJ2YWxzX2dyIDwtIHJlc2l6ZShsZWFkX3NucHNfZ3IsIGZpeCA9ICdjZW50ZXInLCB3aWR0aCA9IDYuNWU1KQpzZXFsZXZlbHNTdHlsZShsZWFkX3NucHNfZ3IpIDwtICJVQ1NDIgpzZXFsZXZlbHNTdHlsZShhbmFseXNpc19pbnRlcnZhbHNfZ3IpIDwtICJVQ1NDIgpnZW5vbWUobGVhZF9zbnBzX2dyKSA8LSBOQQpnZW5vbWUoYW5hbHlzaXNfaW50ZXJ2YWxzX2dyKSA8LSBOQQpgYGAKCkdpdmVuIGxlYWRfc25wc19nciBhbmQgYW5hbHlzaXNfaW50ZXJ2YWxzX2dyIHdlIGNhbiBub3cgaW1wb3J0IDEwMDBHZW5vbWVzIGhhcGxvdHlwZSBkYXRhIHRvIGNhbGN1bGF0ZSBsaW5rYWdlIGRpc2VxdWlsaWJyaXVtIGZyb20gbGVhZC1TTlBzIHRvIHRoZSAxMDAwR2Vub21lcyB2YXJpYW50cy4gSGVyZSB3ZSB1c2UgdGhlIGhhcGxvcGxvdFIgcGFja2FnZSB0byBpbXBvcnQgMTAwMEdlbm9tZXMgZm9yIGRhdGEuIEZpcnN0IEknbGwgc2hvdyB0aGUgcGlwZWxpbmUgd2l0aCBsaW1pdGVkIGdlbm9taWMgbG9jYXRpb25zIGFuZCBwb3B1bGF0aW9ucyBmb2xsb3dlZCBieSBhbiBhbmFseXNpcyBvZiBtdWx0aXBsZSBnZW5vbWljIGxvY2F0aW9ucyBhbmQgbGFzdGx5IHRoZSBjb21wbGV0ZSBhbmFseXNpcyAoY29tbWVudGVkIG91dCBmb3IgcHJhY3RpY2FsIHJlYXNvbnMpLiBUaGUgbGF0dGVyIHJ1biB3aWxsIHJlY3JlYXRlIHRoZSBhY3R1YWwgcmVzdWx0cy4KCiMjIyMgT25lIGdlbm9taWMgbG9jYXRpb24gMyBwb3B1bGF0aW9ucwoKYGBge3IgQW5hbHlzaXMxIGZvciBhIHNpbmdsZSBsb2NhdGlvbiBhbmQgZmV3IHBvcHVsYXRpb25zLCBldmFsPUZBTFNFLCBpbmNsdWRlPVR9CiMgVGhpcyBpcyB0aGUgZm9sZGVyIHdoZXJlIDEwMDBHIGRhdGEgbGl2ZXMKbGRhYmFzZSA8LSBMREFCYXNlJG5ldyhmaWxlX3BhdGggPSAiL2hvbWUvU1NELURhdGEvMTAwMEdlbm9tZXMvIikKCiMgVGhpcyBzZXRzIHVwIGFuIG9iamVjdCBzcGVjaWZ5aW5nIHRoZSBhbmFseXNpcyBpbnRlcnZhbCBhbmQgd2hpY2ggcG9wdWxhdGlvbnMgYXJlIHRvIGJlIGFuYWx5emVkCmxkYWltcG9ydCA8LSBMREFJbXBvcnQkbmV3KGxkYWJhc2UgPSBsZGFiYXNlLCBncmFuZ2VzID0gIGFuYWx5c2lzX2ludGVydmFsc19nclsxXSwgcG9wdWxhdGlvbnMgPSBjKCJDRVUiLCJDSEIiLCJKUFQiKSkKCiMgVGhpcyBpbXBvcnRzIHRoZSBkYXRhCmxkYWltcG9ydCRzZXRfZGF0YSgpCgojIEhlcmUgdGhlIGltcG9ydGVkIGRhdGEgaXMgYXNzb2NpYXRlZCB3aXRoIHRoZSBhbmFseXNpczEgcGlwZWxpbmUKcmVzMSA8LSBMREFhbmFseXNpczEkbmV3KGxlYWRfc25wcyA9IGxlYWRfc25wcywgY3V0b2ZmID0gMC44LCBsZGFfaW1wb3J0ID0gbGRhaW1wb3J0KQoKIyMgTkVFRFMgVE8gQkUgREVCVUdHRUQgLi4uIGRvZXMgbm90IHdvcmsgd2l0aCBvbmx5IG9uZSBhbmFseXNpcyBpbnRlcnZhbApyZXMxJHNldF9yc3F1YXJlZCgpCgpgYGAKCiMjIyMgVHdvIGdlbm9taWMgbG9jYXRpb24gMyBwb3B1bGF0aW9ucwoKYGBge1IgYW5hbHlzaXMxIHdpdGggMiBhbmFseXNpcyBpbnRlcnZhbHMsIGV2YWw9RkFMU0UsIGluY2x1ZGU9VH0KIyBUaGlzIGlzIHRoZSBmb2xkZXIgd2hlcmUgMTAwMEcgZGF0YSBsaXZlcwpsZGFiYXNlIDwtIExEQUJhc2UkbmV3KGZpbGVfcGF0aCA9ICIvaG9tZS9TU0QtRGF0YS8xMDAwR2Vub21lcy8iKQoKIyBUaGlzIHNldHMgdXAgYW4gb2JqZWN0IHNwZWNpZnlpbmcgdGhlIGFuYWx5c2lzIGludGVydmFsIGFuZCB3aGljaCBwb3B1bGF0aW9ucyBhcmUgdG8gYmUgYW5hbHl6ZWQKcmVzMiA8LSBsbHBseShhbmFseXNpc19pbnRlcnZhbHNfZ3JbMToyXSwgZnVuY3Rpb24oeCl7CiAgZGF0IDwtIExEQUltcG9ydCRuZXcobGRhYmFzZSA9IGxkYWJhc2UsIGdyYW5nZXMgPSAgeCwgcG9wdWxhdGlvbnMgPSBjKCJDRVUiLCJDSEIiLCJKUFQiKSkkc2V0X2RhdGEoKQogIHJlcyA8LSBMREFhbmFseXNpczEkbmV3KGxlYWRfc25wcyA9IGxlYWRfc25wcywgY3V0b2ZmID0gMC44LCBsZGFfaW1wb3J0ID0gZGF0KQogIHJlcyRzZXRfcnNxdWFyZWQoKQogIHJlcyRzZXRfcmVzdWx0cygpCiAgaW52aXNpYmxlKHJlcykKfSwgLnBhcmFsbGVsID0gVCkKCiMgdGhpcyBjb2xsZWN0cyB0YWcgc25wIGludGVydmFscyBmcm9tIG11bHRpcGxlIHJlZ2lvbnMgaW50byBvbmUgb2JqZWN0CmhpZ2hfbGQyIDwtIFJlZHVjZShjLE1hcChmdW5jdGlvbih4KSB4JHJlc3VsdHMsIHJlczIpKQpgYGAKCgojIyMjIENvbXBsZXRlIGFuYWx5c2lzOiA5MSBnZW5vbWljIHJlZ2lvbnMgYW5kLCAyNiBwb3B1bGF0aW9ucwoKYGBge1IgdGhlIGNvbXBsZXRlIGFuYWx5c2lzLCBldmFsPUZBTFNFLCBpbmNsdWRlPVR9CgojIFRoaXMgaXMgdGhlIGZvbGRlciB3aGVyZSAxMDAwRyBkYXRhIGxpdmVzCmxkYWJhc2UgPC0gTERBQmFzZSRuZXcoZmlsZV9wYXRoID0gIi9ob21lL1NTRC1EYXRhLzEwMDBHZW5vbWVzLyIpCnByaW50KHBvcHVsYXRpb25zKQpwcmludChsZWFkX3NucHMpCnByaW50KGFuYWx5c2lzX2ludGVydmFsc19ncikKCiMjIFdBUk5JTkc6IHRoaXMgc2hvdWxkIGJldHRlciBub3QgYmUgZXhlY3V0ZWQgb24gYSBkZXNrdG9wIFBDIHVubGVzcyB5b3UgaGF2ZSBlbm91Z2ggbWVtb3J5LgojIHJlZ2lzdGVyRG9NQyhjb3JlcyA9IDE0KQojIFRoaXMgc2V0cyB1cCBhbiBvYmplY3Qgc3BlY2lmeWluZyB0aGUgYW5hbHlzaXMgaW50ZXJ2YWwgYW5kIHdoaWNoIHBvcHVsYXRpb25zIGFyZSB0byBiZSBhbmFseXplZAojIHJlc19jb21wbGV0ZSA8LSBsbHBseShhbmFseXNpc19pbnRlcnZhbHNfZ3IsIGZ1bmN0aW9uKHgpewojICAgZGF0IDwtIExEQUltcG9ydCRuZXcobGRhYmFzZSA9IGxkYWJhc2UsIGdyYW5nZXMgPSAgeCwgcG9wdWxhdGlvbnMgPSBwb3B1bGF0aW9ucykkc2V0X2RhdGEoKQojICAgcmVzIDwtIExEQWFuYWx5c2lzMSRuZXcobGVhZF9zbnBzID0gbGVhZF9zbnBzLCBjdXRvZmYgPSAwLjgsIGxkYV9pbXBvcnQgPSBkYXQpCiMgICByZXMkc2V0X3JzcXVhcmVkKCkKIyAgIHJlcyRzZXRfcmVzdWx0cygpCiMgICBpbnZpc2libGUocmVzKQojIH0sIC5wYXJhbGxlbCA9IFQpCiMgCiMgaGlnaF9sZF9jb21wbGV0ZSA8LSBSZWR1Y2UoYyxNYXAoZnVuY3Rpb24oeCkgeCRyZXN1bHRzLCByZXNfY29tcGxldGUpKQpgYGAKCg==</div>
 
 
 

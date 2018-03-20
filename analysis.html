@@ -124,31 +124,85 @@ $(document).ready(function () {
 </div>
 
 
-<p>Setting up the analysis dependencies are loaded and SNP and populations to be analysed are defined. Furthermore, paths to 1000Genomes vcf and tbi files are set, as well as to the panel file.</p>
+<p>First a number of required packages are loaded and the haploplotR package is installed.</p>
 <pre class="r"><code>library(devtools)
 library(GenomicRanges)
 library(grid)
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 library(SNPlocs.Hsapiens.dbSNP144.GRCh37)
 library(Homo.sapiens)
-devtools::load_all('/home/SSD-Data/Projects/haploplotR/')
+library(doMC)
+library(plyr)
+registerDoMC(cores = 4) # The number of cpu-cores used in the analysis
 
-lead_snps &lt;- c(&quot;rs12569773&quot;, &quot;rs4615961&quot;, &quot;rs10983654&quot;, &quot;rs1512262&quot;, &quot;rs11119348&quot; )
-populations &lt;- c('CEU', 'CHB', 'YRI')
-
-vcffile &lt;- &quot;/home/SSD-Data/1000Genomes/ALL.%s.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz&quot;
-panelfile &lt;- &quot;integrated_call_samples_v3.20130502.ALL.panel&quot;</code></pre>
+devtools::install_github(repo = &quot;joe-nas/haploplotR&quot;)
+devtools::load_all()</code></pre>
 <p>Next information about SNPs is gathered from dbSNP144 and stored as lead_snps_gr. Then, 650Kb intervals are created around the lead_SNPs_gr creating analysis_intervals_gr. Furthermore, both objects are modified to have a common format corresponding to UCSC standart.</p>
-<pre class="r"><code>lead_snps_gr &lt;- GRanges(snpsById(SNPlocs.Hsapiens.dbSNP144.GRCh37, lead_snps))
+<pre class="r"><code>lead_snps &lt;- read.table(&quot;~/../Storage/Documents/Thesis1/section_results/tables/lead_snps.csv&quot;, header = T, stringsAsFactors = F)$lead.SNPs
+populations &lt;- read.table(&quot;~/../Storage/Documents/Thesis1/section_appendix/tables/1000Genomes_populations.csv&quot;, header = T, stringsAsFactors = F, sep = &quot;,&quot;)$Code
+
+lead_snps_gr &lt;- GRanges(snpsById(SNPlocs.Hsapiens.dbSNP144.GRCh37, lead_snps))
 analysis_intervals_gr &lt;- resize(lead_snps_gr, fix = 'center', width = 6.5e5)
 seqlevelsStyle(lead_snps_gr) &lt;- &quot;UCSC&quot;
 seqlevelsStyle(analysis_intervals_gr) &lt;- &quot;UCSC&quot;
 genome(lead_snps_gr) &lt;- NA
 genome(analysis_intervals_gr) &lt;- NA</code></pre>
-<p>Given lead_snps_gr and analysis_intervals_gr we can now import 1000Genomes haplotype data to calculate linkage disequilibrium from lead-SNPs to the 1000Genomes variants.</p>
-<p>Add a new chunk by clicking the <em>Insert Chunk</em> button on the toolbar or by pressing <em>Ctrl+Alt+I</em>.</p>
-<p>When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the <em>Preview</em> button or press <em>Ctrl+Shift+K</em> to preview the HTML file).</p>
-<p>The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike <em>Knit</em>, <em>Preview</em> does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.</p>
+<p>Given lead_snps_gr and analysis_intervals_gr we can now import 1000Genomes haplotype data to calculate linkage disequilibrium from lead-SNPs to the 1000Genomes variants. Here we use the haploplotR package to import 1000Genomes for data. First I’ll show the pipeline with limited genomic locations and populations followed by an analysis of multiple genomic locations and lastly the complete analysis (commented out for practical reasons). The latter run will recreate the actual results.</p>
+<div id="one-genomic-location-3-populations" class="section level4">
+<h4>One genomic location 3 populations</h4>
+<pre class="r"><code># This is the folder where 1000G data lives
+ldabase &lt;- LDABase$new(file_path = &quot;/home/SSD-Data/1000Genomes/&quot;)
+
+# This sets up an object specifying the analysis interval and which populations are to be analyzed
+ldaimport &lt;- LDAImport$new(ldabase = ldabase, granges =  analysis_intervals_gr[1], populations = c(&quot;CEU&quot;,&quot;CHB&quot;,&quot;JPT&quot;))
+
+# This imports the data
+ldaimport$set_data()
+
+# Here the imported data is associated with the analysis1 pipeline
+res1 &lt;- LDAanalysis1$new(lead_snps = lead_snps, cutoff = 0.8, lda_import = ldaimport)
+
+## NEEDS TO BE DEBUGGED ... does not work with only one analysis interval
+res1$set_rsquared()</code></pre>
+</div>
+<div id="two-genomic-location-3-populations" class="section level4">
+<h4>Two genomic location 3 populations</h4>
+<pre class="r"><code># This is the folder where 1000G data lives
+ldabase &lt;- LDABase$new(file_path = &quot;/home/SSD-Data/1000Genomes/&quot;)
+
+# This sets up an object specifying the analysis interval and which populations are to be analyzed
+res2 &lt;- llply(analysis_intervals_gr[1:2], function(x){
+  dat &lt;- LDAImport$new(ldabase = ldabase, granges =  x, populations = c(&quot;CEU&quot;,&quot;CHB&quot;,&quot;JPT&quot;))$set_data()
+  res &lt;- LDAanalysis1$new(lead_snps = lead_snps, cutoff = 0.8, lda_import = dat)
+  res$set_rsquared()
+  res$set_results()
+  invisible(res)
+}, .parallel = T)
+
+# this collects tag snp intervals from multiple regions into one object
+high_ld2 &lt;- Reduce(c,Map(function(x) x$results, res2))</code></pre>
+</div>
+<div id="complete-analysis-91-genomic-regions-and-26-populations" class="section level4">
+<h4>Complete analysis: 91 genomic regions and, 26 populations</h4>
+<pre class="r"><code># This is the folder where 1000G data lives
+ldabase &lt;- LDABase$new(file_path = &quot;/home/SSD-Data/1000Genomes/&quot;)
+print(populations)
+print(lead_snps)
+print(analysis_intervals_gr)
+
+## WARNING: this should better not be executed on a desktop PC unless you have enough memory.
+# registerDoMC(cores = 14)
+# This sets up an object specifying the analysis interval and which populations are to be analyzed
+# res_complete &lt;- llply(analysis_intervals_gr, function(x){
+#   dat &lt;- LDAImport$new(ldabase = ldabase, granges =  x, populations = populations)$set_data()
+#   res &lt;- LDAanalysis1$new(lead_snps = lead_snps, cutoff = 0.8, lda_import = dat)
+#   res$set_rsquared()
+#   res$set_results()
+#   invisible(res)
+# }, .parallel = T)
+# 
+# high_ld_complete &lt;- Reduce(c,Map(function(x) x$results, res_complete))</code></pre>
+</div>
 
 
 
