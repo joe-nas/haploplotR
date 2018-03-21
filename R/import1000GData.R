@@ -77,7 +77,6 @@ import1000GData <- function(where, which, vcf_file, panel_file, ...){
 
     # })
 
-    list(genotype = genotype, info = info)
+    list(genotype = genotype, info = info, granges = where)
   })
-
 }

@@ -1,7 +1,7 @@
 \name{analysis1dat}
 \alias{analysis1dat}
 \docType{data}
-\title{
+\title{Data package for Analysis 1 type of workflow.
 %%   ~~ data name/kind ... ~~
 }
 \description{

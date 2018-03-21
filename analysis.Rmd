@@ -27,8 +27,10 @@ devtools::load_all()
 Next information about SNPs is gathered from dbSNP144 and stored as lead_snps_gr. Then, 650Kb intervals are created around the lead_SNPs_gr creating analysis_intervals_gr. Furthermore, both objects are modified to have a common format corresponding to UCSC standart.
 ```{r Loading lead_snps, eval=FALSE, include=T}
 data(analysis1dat)
-lead_snps <- analysis1dat$lead_snps
-populations <- analysis1dat$populations
+print(summary(lead_snps))
+head(lead_snps)
+print(summary(populations))
+head(populations)
 
 lead_snps_gr <- GRanges(snpsById(SNPlocs.Hsapiens.dbSNP144.GRCh37, lead_snps))
 analysis_intervals_gr <- resize(lead_snps_gr, fix = 'center', width = 6.5e5)
@@ -101,6 +103,7 @@ res_complete <- llply(analysis_intervals_gr, function(x){
   invisible(res)
 }, .parallel = T)
 # 
+names(res_complete) <- with(analysis_intervals_gr, paste(seqnames,start,end,sep = ":"))
 high_ld_complete <- Reduce(c,Map(function(x) x$results, res_complete))
 ```
 
