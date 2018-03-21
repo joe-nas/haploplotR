@@ -26,8 +26,9 @@ devtools::load_all()
 
 Next information about SNPs is gathered from dbSNP144 and stored as lead_snps_gr. Then, 650Kb intervals are created around the lead_SNPs_gr creating analysis_intervals_gr. Furthermore, both objects are modified to have a common format corresponding to UCSC standart.
 ```{r Loading lead_snps, eval=FALSE, include=T}
-lead_snps <- read.table("~/../Storage/Documents/Thesis1/section_results/tables/lead_snps.csv", header = T, stringsAsFactors = F)$lead.SNPs
-populations <- read.table("~/../Storage/Documents/Thesis1/section_appendix/tables/1000Genomes_populations.csv", header = T, stringsAsFactors = F, sep = ",")$Code
+data(analysis1dat)
+lead_snps <- analysis1dat$lead_snps
+populations <- analysis1dat$populations
 
 lead_snps_gr <- GRanges(snpsById(SNPlocs.Hsapiens.dbSNP144.GRCh37, lead_snps))
 analysis_intervals_gr <- resize(lead_snps_gr, fix = 'center', width = 6.5e5)
@@ -84,22 +85,22 @@ high_ld2 <- Reduce(c,Map(function(x) x$results, res2))
 ```{R the complete analysis, eval=FALSE, include=T}
 
 # This is the folder where 1000G data lives
-ldabase <- LDABase$new(file_path = "/home/SSD-Data/1000Genomes/")
+ldabase <- LDABase$new(file_path = "/scratch/jfalck/1000G/")
 print(populations)
 print(lead_snps)
 print(analysis_intervals_gr)
 
 ## WARNING: this should better not be executed on a desktop PC unless you have enough memory.
-# registerDoMC(cores = 14)
+registerDoMC(cores = 14)
 # This sets up an object specifying the analysis interval and which populations are to be analyzed
-# res_complete <- llply(analysis_intervals_gr, function(x){
-#   dat <- LDAImport$new(ldabase = ldabase, granges =  x, populations = populations)$set_data()
-#   res <- LDAanalysis1$new(lead_snps = lead_snps, cutoff = 0.8, lda_import = dat)
-#   res$set_rsquared()
-#   res$set_results()
-#   invisible(res)
-# }, .parallel = T)
+res_complete <- llply(analysis_intervals_gr, function(x){
+  dat <- LDAImport$new(ldabase = ldabase, granges =  x, populations = populations)$set_data()
+  res <- LDAanalysis1$new(lead_snps = lead_snps, cutoff = 0.8, lda_import = dat)
+  res$set_rsquared()
+  res$set_results()
+  invisible(res)
+}, .parallel = T)
 # 
-# high_ld_complete <- Reduce(c,Map(function(x) x$results, res_complete))
+high_ld_complete <- Reduce(c,Map(function(x) x$results, res_complete))
 ```
 
