@@ -6,12 +6,10 @@ LDAanalysis1 <- R6Class("LDAanalysis1",
                           cutoff = NULL,
                           rsquared = NULL,
                           results = NULL,
-                          gr = NULL,
-                          initialize = function(lead_snps = NA, cutoff = 0.8, lda_import = NA, gr = NULL){
+                          initialize = function(lead_snps = NA, cutoff = 0.8, lda_import = NA){
                             self$lda_import <- lda_import
                             self$lead_snps <- lead_snps
                             self$cutoff <- cutoff
-                            self$gr <- gr
                           },
                           set_rsquared = function(){
                             cat(paste0("Calculating R squared.\n"))
@@ -24,7 +22,7 @@ LDAanalysis1 <- R6Class("LDAanalysis1",
                             cat(paste0("Finding HighLD intervals.\n"))
                             self$results <- Reduce(c, llply(names(self$rsquared), function(y){
                               identifyHighLD(rsquared = self$rsquared[[y]], info = self$lda_import[[y]]$info, cutoff = self$cutoff,
-                                             population = y,gr = self$gr)}))
+                                             population = y, gr = self$lda_import[[y]]$gr)}))
                             invisible(self$results)
                           }
                         ))

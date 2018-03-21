@@ -35,7 +35,7 @@ identifyHighLD <- function(rsquared, info, cutoff = 0.8, population = NULL, gr =
   start <- info$pos[tag_interval_start_v]
   end <- info$pos[tag_interval_end_v]
 
-  GRanges(Rle(chromosomes), IRanges(start,end), mcols= meta_df)
+  GRanges(Rle(chromosomes), IRanges(start,end), mcols = meta_df)
 }
 
 

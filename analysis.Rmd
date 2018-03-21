@@ -72,9 +72,9 @@ res1$set_rsquared()
 ldabase <- LDABase$new(file_path = "/home/SSD-Data/1000Genomes/")
 
 # This sets up an object specifying the analysis interval and which populations are to be analyzed
-res2 <- llply(analysis_intervals_gr[1:2], function(x){
-  dat <- LDAImport$new(ldabase = ldabase, granges =  x, populations = c("CEU","CHB"))$set_data()
-  res <- LDAanalysis1$new(lead_snps = lead_snps, cutoff = 0.8, lda_import = dat, gr = x)
+res2 <- llply(analysis_intervals_gr[1:3], function(x){
+  dat <- LDAImport$new(ldabase = ldabase, granges =  x, populations = c("CEU","CHB","JPT"))$set_data()
+  res <- LDAanalysis1$new(lead_snps = lead_snps, cutoff = 0.8, lda_import = dat)
   res$set_rsquared()
   res$set_results()
   invisible(res)
@@ -100,7 +100,7 @@ registerDoMC(cores = 14)
 # This sets up an object specifying the analysis interval and which populations are to be analyzed
 res_complete <- llply(analysis_intervals_gr, function(x){
   dat <- LDAImport$new(ldabase = ldabase, granges =  x, populations = populations)$set_data()
-  res <- LDAanalysis1$new(lead_snps = lead_snps, cutoff = 0.8, lda_import = dat, gr = x)
+  res <- LDAanalysis1$new(lead_snps = lead_snps, cutoff = 0.8, lda_import = dat)
   res$set_rsquared()
   res$set_results()
   invisible(res)
