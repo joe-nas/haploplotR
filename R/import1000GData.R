@@ -76,7 +76,7 @@ import1000GData <- function(where, which, vcf_file, panel_file, ...){
     genotype <- new('SnpMatrix', genotype)
 
     # })
-
+    cat("This is import1000GData \n")
     list(genotype = genotype, info = info, granges = where)
   })
 }

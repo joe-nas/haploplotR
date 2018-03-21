@@ -9,10 +9,11 @@
 This dataset comprises the following:
 1. lead_snps:  a vector of snp identifiers used in the analysis
 2. populations: a vactor of population identifiers used in the anlysis
-3. results: a list of LDAanalysis1 type of objects which comprise:
+3. analysis_intervals:  GRanges objects containing the 650k interval around a lead_snp
+4. results: a list of LDAanalysis1 type of objects which comprise:
   - 1000Genomes data as SnpMatrix
   - ...
-4. tag_snp_intervals: a GRanges object comprising all tag-snp intervals
+5. tag_snp_intervals: a GRanges object comprising all tag-snp intervals
 
 }
 \usage{data("analysis1dat")}

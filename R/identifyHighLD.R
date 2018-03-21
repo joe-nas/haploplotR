@@ -1,4 +1,4 @@
-identifyHighLD <- function(rsquared, info, cutoff = 0.8, population = NULL){
+identifyHighLD <- function(rsquared, info, cutoff = 0.8, population = NULL, gr = NULL){
   # index in rsquared
   highld_idx <- which(rsquared >= cutoff, arr.ind = T)
   tag_snp_idx <- highld_idx[,1] # corresponds with info as well
@@ -25,6 +25,10 @@ identifyHighLD <- function(rsquared, info, cutoff = 0.8, population = NULL){
 
   meta_df <- data.frame(lead_snp = lead_snp_names_v, tag_snp = tag_snp_names_v, rsquared = rs_value_v,
                         population = population, tag_snp_pos = tag_snp_pos_v)
+  if(!is.null(gr)){
+    cat("This is identifyHighLD.R \n")
+    meta_df <- data.frame(meta_df, a_interval = with(gr, paste(seqnames,start,end,sep=":")))
+  }
 
   #GRanges
   chromosomes <- paste("chr", info$chromosome_num[tag_snp_idx], sep = "")
