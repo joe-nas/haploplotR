@@ -21,7 +21,6 @@ registerDoMC(cores = 4) # The number of cpu-cores used in the analysis
 
 devtools::install_github(repo = "joe-nas/haploplotR")
 devtools::load_all()
-
 ```
 
 
