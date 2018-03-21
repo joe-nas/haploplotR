@@ -32,12 +32,15 @@ head(lead_snps)
 print(summary(populations))
 head(populations)
 
-lead_snps_gr <- GRanges(snpsById(SNPlocs.Hsapiens.dbSNP144.GRCh37, lead_snps))
-analysis_intervals_gr <- resize(lead_snps_gr, fix = 'center', width = 6.5e5)
-seqlevelsStyle(lead_snps_gr) <- "UCSC"
-seqlevelsStyle(analysis_intervals_gr) <- "UCSC"
-genome(lead_snps_gr) <- NA
-genome(analysis_intervals_gr) <- NA
+# This is only needed if you are doing the analysis from scratch, e.g. if you start with raw SNP ids. Here such data 
+# comes with the data-package provided
+
+# lead_snps_gr <- GRanges(snpsById(SNPlocs.Hsapiens.dbSNP144.GRCh37, lead_snps))
+# analysis_intervals_gr <- resize(lead_snps_gr, fix = 'center', width = 6.5e5)
+# seqlevelsStyle(lead_snps_gr) <- "UCSC"
+# seqlevelsStyle(analysis_intervals_gr) <- "UCSC"
+# genome(lead_snps_gr) <- NA
+# genome(analysis_intervals_gr) <- NA
 ```
 
 Given lead_snps_gr and analysis_intervals_gr we can now import 1000Genomes haplotype data to calculate linkage disequilibrium from lead-SNPs to the 1000Genomes variants. Here we use the haploplotR package to import 1000Genomes for data. First I'll show the pipeline with limited genomic locations and populations followed by an analysis of multiple genomic locations and lastly the complete analysis (commented out for practical reasons). The latter run will recreate the actual results.
@@ -97,7 +100,7 @@ registerDoMC(cores = 14)
 # This sets up an object specifying the analysis interval and which populations are to be analyzed
 res_complete <- llply(analysis_intervals_gr, function(x){
   dat <- LDAImport$new(ldabase = ldabase, granges =  x, populations = populations)$set_data()
-  res <- LDAanalysis1$new(lead_snps = lead_snps, cutoff = 0.8, lda_import = dat)
+  res <- LDAanalysis1$new(lead_snps = lead_snps, cutoff = 0.8, lda_import = dat, gr = x)
   res$set_rsquared()
   res$set_results()
   invisible(res)

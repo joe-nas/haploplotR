@@ -22,10 +22,9 @@ LDAanalysis1 <- R6Class("LDAanalysis1",
                           },
                           set_results = function(){
                             cat(paste0("Finding HighLD intervals.\n"))
-                            #self$rsquared <<- Filter(function(x) {!is.null(x)}, self$rsquared)
                             self$results <- Reduce(c, llply(names(self$rsquared), function(y){
                               identifyHighLD(rsquared = self$rsquared[[y]], info = self$lda_import[[y]]$info, cutoff = self$cutoff,
-                                             population = y, gr = self$gr)}))
+                                             population = y,gr = self$gr)}))
                             invisible(self$results)
                           }
                         ))

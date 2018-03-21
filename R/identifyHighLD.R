@@ -25,7 +25,7 @@ identifyHighLD <- function(rsquared, info, cutoff = 0.8, population = NULL, gr =
 
   meta_df <- data.frame(lead_snp = lead_snp_names_v, tag_snp = tag_snp_names_v, rsquared = rs_value_v,
                         population = population, tag_snp_pos = tag_snp_pos_v)
-  if(!is.null(gr)){
+  if(!is.null(gr) && length(gr)>0){
     cat("This is identifyHighLD.R \n")
     meta_df <- data.frame(meta_df, a_interval = with(gr, paste(seqnames,start,end,sep=":")))
   }
