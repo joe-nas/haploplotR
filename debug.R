@@ -27,7 +27,7 @@ res2 <- llply(analysis_intervals_gr[1:10], function(x){
   res$set_rsquared()
   res$set_results()
   invisible(res)
-}, .parallel = F, .inform = F, .progress = "text")
+}, .parallel = F, .inform = F, .progress = "text", warn.conflicts = FALSE)
 
 
 # this collects tag snp intervals from multiple regions into one object
