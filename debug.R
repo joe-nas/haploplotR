@@ -7,7 +7,7 @@ library(SNPlocs.Hsapiens.dbSNP144.GRCh37)
 library(Homo.sapiens)
 library(doMC)
 library(plyr)
-registerDoMC(cores = 15) # The number of cpu-cores used in the analysis
+registerDoMC(cores = 25) # The number of cpu-cores used in the analysis
 
 # devtools::install_github(repo = "joe-nas/haploplotR")
 
