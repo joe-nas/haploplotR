@@ -19,6 +19,8 @@ import1000GData <- function(where, which, vcf_file, panel_file, ...){
   start_pos <- start(where)
   end_pos <- end(where)
 
+  gr_str <- paste(chromosome_str, start_pos, end_pos, sep = ":")
+
   res <- llply(panel_file_pops, function(x){
     vcf_handle <- with(where, WhopGenome::vcf_open(sprintf(vcf_file, chromosome_str)))
     WhopGenome::vcf_setregion(vcffh = vcf_handle, chromosome_num, start_pos, end_pos)
@@ -77,6 +79,6 @@ import1000GData <- function(where, which, vcf_file, panel_file, ...){
 
     # })
     cat("This is import1000GData \n")
-    list(genotype = genotype, info = info, gr = where)
+    list(genotype = genotype, info = info, gr = where, gr_str = gr_str)
   })
 }

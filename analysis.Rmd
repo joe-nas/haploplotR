@@ -9,6 +9,7 @@ output:
 
 First a number of required packages are loaded and the haploplotR package is installed.
 ```{r Setting up the environment, eval=FALSE, include=T}
+.rs.restartR()
 library(devtools)
 library(GenomicRanges)
 library(grid)
@@ -19,7 +20,9 @@ library(doMC)
 library(plyr)
 registerDoMC(cores = 4) # The number of cpu-cores used in the analysis
 
-devtools::install_github(repo = "joe-nas/haploplotR")
+# devtools::install_github(repo = "joe-nas/haploplotR")
+
+devtools::build()
 devtools::load_all()
 ```
 
@@ -72,7 +75,7 @@ res1$set_rsquared()
 ldabase <- LDABase$new(file_path = "/home/SSD-Data/1000Genomes/")
 
 # This sets up an object specifying the analysis interval and which populations are to be analyzed
-res2 <- llply(analysis_intervals_gr[1:3], function(x){
+res2 <- llply(analysis_intervals_gr[2:3], function(x){
   dat <- LDAImport$new(ldabase = ldabase, granges =  x, populations = c("CEU","CHB","JPT"))$set_data()
   res <- LDAanalysis1$new(lead_snps = lead_snps, cutoff = 0.8, lda_import = dat)
   res$set_rsquared()

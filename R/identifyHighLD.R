@@ -1,4 +1,4 @@
-identifyHighLD <- function(rsquared, info, gr = NULL, cutoff = 0.8, population = NULL){
+identifyHighLD <- function(rsquared, info, cutoff = 0.8, population = NULL, gr_str = NA){
   # index in rsquared
   highld_idx <- which(rsquared >= cutoff, arr.ind = T)
   tag_snp_idx <- highld_idx[,1] # corresponds with info as well
@@ -19,17 +19,8 @@ identifyHighLD <- function(rsquared, info, gr = NULL, cutoff = 0.8, population =
   # lead_snp_pos_v <- info$pos[which(lead_snp_names_v == info$ids)] ## THIS NEEDS TO BE DEBUGGED
   tag_snp_pos_v <- info$pos[highld_idx[,1]]
 
-  #DEBUB
-  # print(tag_snp_names_v)
-  # print(lead_snp_names_v)
-
   meta_df <- data.frame(lead_snp = lead_snp_names_v, tag_snp = tag_snp_names_v, rsquared = rs_value_v,
-                        population = population, tag_snp_pos = tag_snp_pos_v)
-
-  if(!is.null(gr) && length(gr)>0){
-    a_interval_str <- with(gr, paste(seqnames,start,end,sep=":"))
-    meta_df <- data.frame(meta_df, a_interval = a_interval_str)
-  }
+                        population = population, tag_snp_pos = tag_snp_pos_v, gr_str = gr_str)
   cat("This is identifyHighLD.R \n")
 
   #GRanges

@@ -138,15 +138,21 @@ registerDoMC(cores = 4) # The number of cpu-cores used in the analysis
 devtools::install_github(repo = &quot;joe-nas/haploplotR&quot;)
 devtools::load_all()</code></pre>
 <p>Next information about SNPs is gathered from dbSNP144 and stored as lead_snps_gr. Then, 650Kb intervals are created around the lead_SNPs_gr creating analysis_intervals_gr. Furthermore, both objects are modified to have a common format corresponding to UCSC standart.</p>
-<pre class="r"><code>lead_snps &lt;- read.table(&quot;~/../Storage/Documents/Thesis1/section_results/tables/lead_snps.csv&quot;, header = T, stringsAsFactors = F)$lead.SNPs
-populations &lt;- read.table(&quot;~/../Storage/Documents/Thesis1/section_appendix/tables/1000Genomes_populations.csv&quot;, header = T, stringsAsFactors = F, sep = &quot;,&quot;)$Code
+<pre class="r"><code>data(analysis1dat)
+print(summary(lead_snps))
+head(lead_snps)
+print(summary(populations))
+head(populations)
 
-lead_snps_gr &lt;- GRanges(snpsById(SNPlocs.Hsapiens.dbSNP144.GRCh37, lead_snps))
-analysis_intervals_gr &lt;- resize(lead_snps_gr, fix = 'center', width = 6.5e5)
-seqlevelsStyle(lead_snps_gr) &lt;- &quot;UCSC&quot;
-seqlevelsStyle(analysis_intervals_gr) &lt;- &quot;UCSC&quot;
-genome(lead_snps_gr) &lt;- NA
-genome(analysis_intervals_gr) &lt;- NA</code></pre>
+# This is only needed if you are doing the analysis from scratch, e.g. if you start with raw SNP ids. Here such data 
+# comes with the data-package provided
+
+# lead_snps_gr &lt;- GRanges(snpsById(SNPlocs.Hsapiens.dbSNP144.GRCh37, lead_snps))
+# analysis_intervals_gr &lt;- resize(lead_snps_gr, fix = 'center', width = 6.5e5)
+# seqlevelsStyle(lead_snps_gr) &lt;- &quot;UCSC&quot;
+# seqlevelsStyle(analysis_intervals_gr) &lt;- &quot;UCSC&quot;
+# genome(lead_snps_gr) &lt;- NA
+# genome(analysis_intervals_gr) &lt;- NA</code></pre>
 <p>Given lead_snps_gr and analysis_intervals_gr we can now import 1000Genomes haplotype data to calculate linkage disequilibrium from lead-SNPs to the 1000Genomes variants. Here we use the haploplotR package to import 1000Genomes for data. First I’ll show the pipeline with limited genomic locations and populations followed by an analysis of multiple genomic locations and lastly the complete analysis (commented out for practical reasons). The latter run will recreate the actual results.</p>
 <div id="one-genomic-location-3-populations" class="section level4">
 <h4>One genomic location 3 populations</h4>
@@ -171,13 +177,13 @@ res1$set_rsquared()</code></pre>
 ldabase &lt;- LDABase$new(file_path = &quot;/home/SSD-Data/1000Genomes/&quot;)
 
 # This sets up an object specifying the analysis interval and which populations are to be analyzed
-res2 &lt;- llply(analysis_intervals_gr[1:2], function(x){
+res2 &lt;- llply(analysis_intervals_gr[1:3], function(x){
   dat &lt;- LDAImport$new(ldabase = ldabase, granges =  x, populations = c(&quot;CEU&quot;,&quot;CHB&quot;,&quot;JPT&quot;))$set_data()
   res &lt;- LDAanalysis1$new(lead_snps = lead_snps, cutoff = 0.8, lda_import = dat)
   res$set_rsquared()
   res$set_results()
   invisible(res)
-}, .parallel = T)
+}, .parallel = F,.inform = T)
 
 # this collects tag snp intervals from multiple regions into one object
 high_ld2 &lt;- Reduce(c,Map(function(x) x$results, res2))</code></pre>
@@ -185,23 +191,24 @@ high_ld2 &lt;- Reduce(c,Map(function(x) x$results, res2))</code></pre>
 <div id="complete-analysis-91-genomic-regions-and-26-populations" class="section level4">
 <h4>Complete analysis: 91 genomic regions and, 26 populations</h4>
 <pre class="r"><code># This is the folder where 1000G data lives
-ldabase &lt;- LDABase$new(file_path = &quot;/home/SSD-Data/1000Genomes/&quot;)
+ldabase &lt;- LDABase$new(file_path = &quot;/scratch/jfalck/1000G/&quot;)
 print(populations)
 print(lead_snps)
 print(analysis_intervals_gr)
 
 ## WARNING: this should better not be executed on a desktop PC unless you have enough memory.
-# registerDoMC(cores = 14)
+registerDoMC(cores = 14)
 # This sets up an object specifying the analysis interval and which populations are to be analyzed
-# res_complete &lt;- llply(analysis_intervals_gr, function(x){
-#   dat &lt;- LDAImport$new(ldabase = ldabase, granges =  x, populations = populations)$set_data()
-#   res &lt;- LDAanalysis1$new(lead_snps = lead_snps, cutoff = 0.8, lda_import = dat)
-#   res$set_rsquared()
-#   res$set_results()
-#   invisible(res)
-# }, .parallel = T)
+res_complete &lt;- llply(analysis_intervals_gr[1:2], function(x){
+  dat &lt;- LDAImport$new(ldabase = ldabase, granges =  x, populations = populations)$set_data()
+  res &lt;- LDAanalysis1$new(lead_snps = lead_snps, cutoff = 0.8, lda_import = dat)
+  res$set_rsquared()
+  res$set_results()
+  invisible(res)
+}, .parallel = T)
 # 
-# high_ld_complete &lt;- Reduce(c,Map(function(x) x$results, res_complete))</code></pre>
+names(res_complete) &lt;- with(analysis_intervals_gr, paste(seqnames,start,end,sep = &quot;:&quot;))
+high_ld_complete &lt;- Reduce(c,Map(function(x) x$results, res_complete))</code></pre>
 </div>
 
 
