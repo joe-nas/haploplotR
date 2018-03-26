@@ -13,6 +13,8 @@ Imports:
     GenomicRanges,
     grid,
     snpStats,
+    survival,
+    Matrix,
     biovizBase,
     Homo.sapiens
 Suggests: 
