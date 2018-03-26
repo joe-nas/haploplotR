@@ -29,7 +29,7 @@ import1000GData <- function(where, which, vcf_file, panel_file, ...){
     #print(x)
     sink("/dev/null")
     WhopGenome::vcf_selectsamples(vcf_handle, which)
-    WhopGenome::vcf_getregion(vcf_handle)
+    #WhopGenome::vcf_getregion(vcf_handle)
 
     #print(WhopGenome::vcf_getregion(vcf_handle))
     ## create info df
