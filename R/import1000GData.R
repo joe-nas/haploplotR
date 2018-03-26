@@ -21,13 +21,13 @@ import1000GData <- function(where, which, vcf_file, panel_file, ...){
 
   gr_str <- paste(chromosome_str, start_pos, end_pos, sep = ":")
   res <- llply(panel_file_pops, function(x){
+    sink("/dev/null")
     vcf_handle <- with(where, WhopGenome::vcf_open(sprintf(vcf_file, chromosome_str)))
+    sink("/dev/stdout")
     WhopGenome::vcf_setregion(vcffh = vcf_handle, chromosome_num, start_pos, end_pos)
 
     which <- x$sample
 
-    #print(x)
-    sink("/dev/null")
     WhopGenome::vcf_selectsamples(vcf_handle, which)
     #WhopGenome::vcf_getregion(vcf_handle)
 
