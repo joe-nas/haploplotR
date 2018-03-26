@@ -35,6 +35,7 @@ import1000GData <- function(where, which, vcf_file, panel_file, ...){
     ## create info df
     ids <- c()
     pos <- c()
+    sink("/dev/null")
     repeat{
       WhopGenome::vcf_parseNextSNP(vcf_handle)
       ids <- c(ids, WhopGenome::vcf_getID(vcf_handle))
@@ -71,7 +72,7 @@ import1000GData <- function(where, which, vcf_file, panel_file, ...){
 
     genotype <- haploplotR::toRawSnpMat(ishet[,keep], hasalt[,keep])
     dimnames(genotype) <- list(which, info$ids)
-
+    sink("/dev/stdout")
     ## create SnpMatrix object snpStats
     #require(snpStats)
     genotype <- new('SnpMatrix', genotype)
