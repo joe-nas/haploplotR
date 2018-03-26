@@ -73,7 +73,7 @@ import1000GData <- function(where, which, vcf_file, panel_file, ...){
     dimnames(genotype) <- list(which, info$ids)
 
     ## create SnpMatrix object snpStats
-    require(snpStats)
+    #require(snpStats)
     genotype <- new('SnpMatrix', genotype)
 
     # })
