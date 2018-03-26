@@ -1,4 +1,4 @@
-require(R6, quietly = T)
+require(R6, quietly = T, warn.conflicts = FALSE)
 LDABase <- R6Class("LDABase",
                    public = list(
                      lead_snps = NULL,

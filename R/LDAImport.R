@@ -1,4 +1,4 @@
-require(R6, quietly = T)
+require(R6, quietly = T, warn.conflicts = FALSE)
 LDAImport <- R6Class("LDAImport",
                      public = list(
                        ldabase = NULL,
