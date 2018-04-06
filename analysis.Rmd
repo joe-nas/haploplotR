@@ -115,8 +115,12 @@ save(res_analysis1, high_ld_analysis1, file="data/res_analysis1.RData")
 ```
 Now that we have the tag-SNP interval, we just have to overlap them with p63 BS positions.
 ```{r}
+data("res_analysis1")
 
-
+p63_tagSNP_ol <- findOverlaps(p63BS, high_ld_analysis1)
+p63ol <- p63BS[queryHits(p63_tagSNP_ol)]
+tagsnpol <- high_ld_analysis1[subjectHits(p63_tagSNP_ol)]
+mcols(p63ol) <- data.frame(p63ID=mcols(p63ol),as.data.frame(tagsnpol))
 
 ```
 
