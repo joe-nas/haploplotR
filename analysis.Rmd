@@ -34,7 +34,7 @@ print(summary(lead_snps))
 head(lead_snps)
 print(summary(populations))
 head(populations)
-
+data("res_analysis1")
 # This is only needed if you are doing the analysis from scratch, e.g. if you start with raw SNP ids. Here such data 
 # comes with the data-package provided
 
@@ -115,8 +115,7 @@ save(res_analysis1, high_ld_analysis1, file="data/res_analysis1.RData")
 ```
 Now that we have the tag-SNP interval, we just have to overlap them with p63 BS positions.
 ```{r}
-p63BS <- with(read.table("/home/Storage/Documents/Thesis1/section_appendix/tables/appendix.p63BS_hg19.bed",
-                         stringsAsFactors = F, header = F), GRanges(Rle(V1), IRanges(start = V2, end = V3), ID=V4))
+
 
 
 ```
