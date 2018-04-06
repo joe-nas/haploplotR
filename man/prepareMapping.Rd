@@ -30,4 +30,3 @@ Preparing mapping data.frame in upperTriGrob
 \examples{
 color_highlights <- list(common = 'green', lead = 'yellow', tag = 'cyan')
 }
-

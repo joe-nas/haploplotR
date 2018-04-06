@@ -26,4 +26,3 @@ Maps numeric values of matrix to colors
 \examples{
 color_highlights <- list(common = 'green', lead = 'yellow', tag = 'cyan')
 }
-

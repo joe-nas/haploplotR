@@ -16,4 +16,3 @@ internal functions used in genesGrob to specify y position of transcripts
 where <- GRanges(Rle('chr1'), IRanges(start = 209789729, end = 210189729))
 COMPLETE EXAMPLE
 }
-

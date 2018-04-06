@@ -10,7 +10,7 @@
 
 
 import1000GData <- function(where, which, vcf_file, panel_file, ...){
-  # capture.output({
+ # capture.output({
   panel_file <- read.table(panel_file, header = T, stringsAsFactors = F)
   panel_file_pops <- split(panel_file, panel_file$pop)[which]
 
@@ -21,17 +21,14 @@ import1000GData <- function(where, which, vcf_file, panel_file, ...){
 
   gr_str <- paste(chromosome_str, start_pos, end_pos, sep = ":")
   res <- llply(panel_file_pops, function(x){
-    sink("/dev/null")
     vcf_handle <- with(where, WhopGenome::vcf_open(sprintf(vcf_file, chromosome_str)))
-    sink("/dev/stdout")
     WhopGenome::vcf_setregion(vcffh = vcf_handle, chromosome_num, start_pos, end_pos)
+
 
     which <- x$sample
 
     WhopGenome::vcf_selectsamples(vcf_handle, which)
-    #WhopGenome::vcf_getregion(vcf_handle)
 
-    #print(WhopGenome::vcf_getregion(vcf_handle))
     ## create info df
     ids <- c()
     pos <- c()
@@ -44,6 +41,7 @@ import1000GData <- function(where, which, vcf_file, panel_file, ...){
         break
       }
     }
+
     info <- data.frame(pos, ids, chromosome_num, stringsAsFactors = F)
 
     ## get heterocygosity
@@ -62,7 +60,6 @@ import1000GData <- function(where, which, vcf_file, panel_file, ...){
 
     ## close file handler
     WhopGenome::vcf_close(vcf_handle)
-
     ## keep this columns
     keep <- intersect(colnames(hasalt), colnames(ishet))
 
@@ -81,5 +78,5 @@ import1000GData <- function(where, which, vcf_file, panel_file, ...){
     cat("This is import1000GData \n")
     list(genotype = genotype, info = info, gr = where, gr_str = gr_str)
   }, .parallel = T)
-  sink("/dev/stdout")
+#  },type = "/dev/null")
 }

@@ -23,4 +23,3 @@ internal functions used in genesGrob to produce arrows
 \examples{
 where <- GRanges(Rle('chr1'), IRanges(start = 209789729, end = 210189729))
 }
-

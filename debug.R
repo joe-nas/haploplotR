@@ -7,7 +7,7 @@ library(SNPlocs.Hsapiens.dbSNP144.GRCh37)
 library(Homo.sapiens)
 library(doMC)
 library(plyr)
-registerDoMC(cores = 16) # The number of cpu-cores used in the analysis
+registerDoMC(cores = 4) # The number of cpu-cores used in the analysis
 options(warn=-1)
 
 # devtools::install_github(repo = "joe-nas/haploplotR")
@@ -21,8 +21,8 @@ ldabase <- LDABase$new(file_path = "/home/SSD-Data/1000Genomes/")
 ldabase <- LDABase$new(file_path = "/scratch/jfalck/1000G/")
 
 # This sets up an object specifying the analysis interval and which populations are to be analyzed
-res2 <- llply(analysis_intervals_gr[1:10], function(x){
-  dat <- LDAImport$new(ldabase = ldabase, granges =  x, populations = populations)$set_data()
+res2 <- llply(analysis_intervals_gr[1:4], function(x){
+  dat <- LDAImport$new(ldabase = ldabase, granges =  x, populations = populations[1:4])$set_data()
   res <- LDAanalysis1$new(lead_snps = lead_snps, cutoff = 0.8, lda_import = dat)
   res$set_rsquared()
   res$set_results()

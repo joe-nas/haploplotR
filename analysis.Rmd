@@ -101,13 +101,13 @@ print(analysis_intervals_gr)
 ## WARNING: this should better not be executed on a desktop PC unless you have enough memory.
 registerDoMC(cores = 14)
 # This sets up an object specifying the analysis interval and which populations are to be analyzed
-res_complete <- llply(analysis_intervals_gr[1:2], function(x){
+res_complete <- llply(analysis_intervals_gr, function(x){
   dat <- LDAImport$new(ldabase = ldabase, granges =  x, populations = populations)$set_data()
   res <- LDAanalysis1$new(lead_snps = lead_snps, cutoff = 0.8, lda_import = dat)
   res$set_rsquared()
   res$set_results()
   invisible(res)
-}, .parallel = T)
+}, .parallel = F)
 # 
 names(res_complete) <- with(analysis_intervals_gr, paste(seqnames,start,end,sep = ":"))
 high_ld_complete <- Reduce(c,Map(function(x) x$results, res_complete))

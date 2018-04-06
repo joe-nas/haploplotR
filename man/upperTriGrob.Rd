@@ -35,4 +35,3 @@ mygenes <- genesGrob(where = where, what = TxDb.Hsapiens.UCSC.hg19.knownGene)
 pushViewport(viewport)
 grid.draw(mygenes)
 }
-

@@ -14,4 +14,3 @@ matrix A matrix of encoding the genotype as type Raw. 01 homozygous reference al
 \description{
 Create matrix with type Raw from matrices describing heterogeneity and presence of the alternative allele
 }
-
