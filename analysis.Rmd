@@ -29,7 +29,7 @@ devtools::load_all()
 
 Next information about SNPs is gathered from dbSNP144 and stored as lead_snps_gr. Then, 650Kb intervals are created around the lead_SNPs_gr creating analysis_intervals_gr. Furthermore, both objects are modified to have a common format corresponding to UCSC standart.
 ```{r Loading lead_snps, eval=FALSE, include=T}
-data(analysis1dat)
+data(analysis1)
 print(summary(lead_snps))
 head(lead_snps)
 print(summary(populations))
