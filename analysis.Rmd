@@ -134,13 +134,18 @@ data(p63_ol_tagSNP_a1)
 library(ChIPpeakAnno)
 library(biomaRt)
 data(TSS.human.GRCh37)
-ig <- c(read.table("/home/SSD-Data/Projects/thesis/section_appendix/tables/interestinggenes.csv", header = T, stringsAsFactors = F))
-mart = useMart(biomart = "ENSEMBL_MART_ENSEMBL", host="grch37.ensembl.org", path="/biomart/martservice", dataset = "hsapiens_gene_ensembl")
-ig_tss <- getBM(mart, attributes = c("chromosome_name","strand","transcription_start_site","external_gene_name","ensembl_gene_id"), values = ig$Promoter, mart = mart, filter="external_gene_name")
-ig_tss_gr <- with(ig_tss, GRanges(Rle(chromosome_name),IRanges(start=transcription_start_site, end = transcription_start_site),strand = strand),names = external_gene_name)
-elementMetadata(ig_tss_gr) <- data.frame(ensembl_gene_id = ig_tss$ensembl_gene_id)
-ig_tss_promoters_gr <- promoters(ig_tss_gr)
+library(org.Hs.eg.db)
+library(TxDb.Hsapiens.UCSC.hg19.knownGene)
+columns(TxDb.Hsapiens.UCSC.hg19.knownGene)
+library(Homo.sapiens)
+promoters2200 <- promoters(TxDb.Hsapiens.UCSC.hg19.knownGene)
+mapping <-select(Homo.sapiens, keys=promoters2200$tx_name, columns="SYMBOL", keytype="TXNAME")
+elementMetadata(promoters2200) <- data.frame(mapping)
 
+ig <- read.table("/home/SSD-Data/Projects/thesis/section_appendix/tables/interestinggenes.csv", header = F, stringsAsFactors = F)$V1
+
+promoters2200 <- promoters2200[promoters2200$SYMBOL %in% ig]
+testpromoters <- keepStandardChromosomes(promoters2200)
 
 ## 
 ig_merged_prmoters_gr <- reduce(ig_tss_promoters_gr)
@@ -174,8 +179,10 @@ res_analysis2 <- llply(analysis_intervals_a2[c(-13,-36)], function(x){
   invisible(res)
 }, .parallel = F)
 
-high_ld_analysis2 <- Reduce(c,Map(function(x) x$results, res_analysis2))
-
+data('res_analysis2')
+high_ld_analysis2 <- Reduce(c,high_ld_analysis2)
+seqlevelsStyle(promoter2200) <- "UCSC"
+subsetByOverlaps(promoter2200, high_ld_analysis2)
 
 
 ```
