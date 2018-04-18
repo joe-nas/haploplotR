@@ -144,6 +144,7 @@ ig_tss_promoters_gr <- promoters(ig_tss_gr)
 
 ## 
 ig_merged_prmoters_gr <- reduce(ig_tss_promoters_gr)
+promoter2200 <- ig_merged_prmoters_gr
 ## resize promoter regions to 650kb
 promoter650k <-  reduce(resize(ig_merged_prmoters_gr,width = 650000,fix = 'center'))
 ## change seqlevelstyle to UCSC
@@ -156,7 +157,7 @@ snps_ig_p63BS_promoters <- snpsByOverlaps(SNPlocs.Hsapiens.dbSNP144.GRCh37, p63B
 snps_a2 <- snps_ig_p63BS_promoters$RefSNP_id
 analysis_intervals_a2 <- promoter650k
 populations
-save(snps_a2, analysis_intervals_a2, populations, file = "data/analysis2.RData")
+save(snps_a2,promoter2200, analysis_intervals_a2, populations, file = "data/analysis2.RData")
 
 
 ```
@@ -165,14 +166,16 @@ save(snps_a2, analysis_intervals_a2, populations, file = "data/analysis2.RData")
 data('analysis2')
 registerDoMC(cores = 14)
 ldabase <- LDABase$new(file_path = "/scratch/jfalck/1000G/")
-seqlevelsStyle(analysis_intervals_a2) <- "UCSC"
-res_analysis2 <- llply(analysis_intervals_a2, function(x){
+res_analysis2 <- llply(analysis_intervals_a2[c(-13,-36)], function(x){
   dat <- LDAImport$new(ldabase = ldabase, granges =  x, populations = populations)$set_data()
   res <- LDAanalysis1$new(lead_snps = snps_a2, cutoff = 0.8, lda_import = dat)
   res$set_rsquared()
   res$set_results()
   invisible(res)
 }, .parallel = F)
+
+high_ld_analysis2 <- Reduce(c,Map(function(x) x$results, res_analysis2))
+
 
 
 ```
