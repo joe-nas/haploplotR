@@ -121,6 +121,40 @@ p63_tagSNP_ol <- findOverlaps(p63BS, high_ld_analysis1)
 p63ol <- p63BS[queryHits(p63_tagSNP_ol)]
 tagsnpol <- high_ld_analysis1[subjectHits(p63_tagSNP_ol)]
 mcols(p63ol) <- data.frame(p63ID=mcols(p63ol),as.data.frame(tagsnpol))
+p63oltagsnp <- p63ol
+save(p63oltagsnp, file="data/p63_ol_tagSNP_a1.RData")
+
+
+data(p63_ol_tagSNP_a1)
+```
+
+#### Analysis 2, target genes
+
+```{r}
+library(ChIPpeakAnno)
+library(biomaRt)
+data(TSS.human.GRCh37)
+ig <- c(read.table("/home/SSD-Data/Projects/thesis/section_appendix/tables/interestinggenes.csv", header = T, stringsAsFactors = F))
+mart = useMart(biomart = "ENSEMBL_MART_ENSEMBL", host="grch37.ensembl.org", path="/biomart/martservice", dataset = "hsapiens_gene_ensembl")
+ig_tss <- getBM(mart, attributes = c("chromosome_name","strand","transcription_start_site","external_gene_name","ensembl_gene_id"), values = ig$Promoter, mart = mart, filter="external_gene_name")
+ig_tss_gr <- with(ig_tss, GRanges(Rle(chromosome_name),IRanges(start=transcription_start_site, end = transcription_start_site),strand = strand),names = external_gene_name)
+elementMetadata(ig_tss_gr) <- data.frame(ensembl_gene_id = ig_tss$ensembl_gene_id)
+ig_tss_promoters_gr <- promoters(ig_tss_gr)
+
+
+## 
+ig_merged_prmoters_gr <- reduce(ig_tss_promoters_gr)
+## resize promoter regions to 650kb
+promoter650k <-  reduce(resize(ig_merged_prmoters_gr,width = 650000,fix = 'center'))
+## change seqlevelstyle to UCSC
+seqlevelsStyle(p63BS) <- "NCBI"
+data('analysis1')
+## find p63BS within regions
+p63BS_in_promoterwindows <- subsetByOverlaps(p63BS, promoter650k)
+
+snps_ig_p63BS_promoters <- snpsByOverlaps(SNPlocs.Hsapiens.dbSNP144.GRCh37, p63BS_in_promoterwindows)
+
 
 ```
+
 
