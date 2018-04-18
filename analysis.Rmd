@@ -153,6 +153,26 @@ data('analysis1')
 p63BS_in_promoterwindows <- subsetByOverlaps(p63BS, promoter650k)
 
 snps_ig_p63BS_promoters <- snpsByOverlaps(SNPlocs.Hsapiens.dbSNP144.GRCh37, p63BS_in_promoterwindows)
+snps_a2 <- snps_ig_p63BS_promoters$RefSNP_id
+analysis_intervals_a2 <- promoter650k
+populations
+save(snps_a2, analysis_intervals_a2, populations, file = "data/analysis2.RData")
+
+
+```
+#### Analysis 2 workflow
+```{r }
+data('analysis2')
+registerDoMC(cores = 14)
+ldabase <- LDABase$new(file_path = "/scratch/jfalck/1000G/")
+seqlevelsStyle(analysis_intervals_a2) <- "UCSC"
+res_analysis2 <- llply(analysis_intervals_a2, function(x){
+  dat <- LDAImport$new(ldabase = ldabase, granges =  x, populations = populations)$set_data()
+  res <- LDAanalysis1$new(lead_snps = snps_a2, cutoff = 0.8, lda_import = dat)
+  res$set_rsquared()
+  res$set_results()
+  invisible(res)
+}, .parallel = F)
 
 
 ```
