@@ -134,31 +134,33 @@ data(p63_ol_tagSNP_a1)
 library(ChIPpeakAnno)
 library(biomaRt)
 data(TSS.human.GRCh37)
-library(org.Hs.eg.db)
-library(TxDb.Hsapiens.UCSC.hg19.knownGene)
-columns(TxDb.Hsapiens.UCSC.hg19.knownGene)
-library(Homo.sapiens)
-promoters2200 <- promoters(TxDb.Hsapiens.UCSC.hg19.knownGene)
-mapping <-select(Homo.sapiens, keys=promoters2200$tx_name, columns="SYMBOL", keytype="TXNAME")
-elementMetadata(promoters2200) <- data.frame(mapping)
+promoters(TSS.human.GRCh37)
+library(EnsDb.Hsapiens.v75)
 
+
+promoters2200 <- promoters(TSS.human.GRCh37)
+mapping <- mapIds(org.Hs.eg.db, keys = names(promoters2200),column = "SYMBOL", keytype = "ENSEMBL", multiVals = 'first')
+elementMetadata(promoters2200) <- data.frame(elementMetadata(promoters2200), mapping)
+promoters2200
+
+
+## load interesting genes and find corresponding promoter regions
 ig <- read.table("/home/SSD-Data/Projects/thesis/section_appendix/tables/interestinggenes.csv", header = F, stringsAsFactors = F)$V1
+ig <- Reduce(c,strsplit(ig,"/"))
+ig_promoters <- promoters2200[promoters2200$mapping %in% ig]
 
-promoters2200 <- promoters2200[promoters2200$SYMBOL %in% ig]
-testpromoters <- keepStandardChromosomes(promoters2200)
+## remove chromosomes that cannot be analysed using 1000G data
+ig_prom_pruned <- keepStandardChromosomes(ig_promoters,pruning.mode = 'coarse')
 
-## 
-ig_merged_prmoters_gr <- reduce(ig_tss_promoters_gr)
-promoter2200 <- ig_merged_prmoters_gr
-## resize promoter regions to 650kb
-promoter650k <-  reduce(resize(ig_merged_prmoters_gr,width = 650000,fix = 'center'))
-## change seqlevelstyle to UCSC
-seqlevelsStyle(p63BS) <- "NCBI"
-data('analysis1')
-## find p63BS within regions
-p63BS_in_promoterwindows <- subsetByOverlaps(p63BS, promoter650k)
+## create 650kb size analysis windows around promoters
+promoter650k <-  reduce(resize(ig_prom_pruned,width = 650000,fix = 'center'))
 
-snps_ig_p63BS_promoters <- snpsByOverlaps(SNPlocs.Hsapiens.dbSNP144.GRCh37, p63BS_in_promoterwindows)
+## finding snps in promoters
+library(SNPlocs.Hsapiens.dbSNP144.GRCh37)
+genome(ig_prom_pruned) <- "GRCh37.p13"
+
+
+snp_in_promoters <- snpsByOverlaps(SNPlocs.Hsapiens.dbSNP144.GRCh37, ig_prom_pruned)
 snps_a2 <- snps_ig_p63BS_promoters$RefSNP_id
 analysis_intervals_a2 <- promoter650k
 populations
