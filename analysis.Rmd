@@ -164,7 +164,7 @@ snp_in_promoters <- snpsByOverlaps(SNPlocs.Hsapiens.dbSNP144.GRCh37, ig_prom_pru
 snps_a2 <- snp_in_promoters$RefSNP_id
 analysis_intervals_a2 <- promoter650k
 populations
-save(snps_a2,promoters2200, analysis_intervals_a2, populations, file = "data/analysis2.RData")
+save(snps_a2, ig_prom_pruned, analysis_intervals_a2, populations, file = "data/analysis2.RData")
 
 
 ```
