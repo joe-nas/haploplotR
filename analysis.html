@@ -92,6 +92,9 @@ img {
 .tabbed-pane {
   padding-top: 12px;
 }
+.html-widget {
+  margin-bottom: 20px;
+}
 button.code-folding-btn:focus {
   outline: none;
 }
@@ -125,7 +128,8 @@ $(document).ready(function () {
 
 
 <p>First a number of required packages are loaded and the haploplotR package is installed.</p>
-<pre class="r"><code>library(devtools)
+<pre class="r"><code>.rs.restartR()
+library(devtools)
 library(GenomicRanges)
 library(grid)
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
@@ -135,15 +139,17 @@ library(doMC)
 library(plyr)
 registerDoMC(cores = 4) # The number of cpu-cores used in the analysis
 
-devtools::install_github(repo = &quot;joe-nas/haploplotR&quot;)
+# devtools::install_github(repo = &quot;joe-nas/haploplotR&quot;)
+
+devtools::build()
 devtools::load_all()</code></pre>
 <p>Next information about SNPs is gathered from dbSNP144 and stored as lead_snps_gr. Then, 650Kb intervals are created around the lead_SNPs_gr creating analysis_intervals_gr. Furthermore, both objects are modified to have a common format corresponding to UCSC standart.</p>
-<pre class="r"><code>data(analysis1dat)
+<pre class="r"><code>data(analysis1)
 print(summary(lead_snps))
 head(lead_snps)
 print(summary(populations))
 head(populations)
-
+data(&quot;res_analysis1&quot;)
 # This is only needed if you are doing the analysis from scratch, e.g. if you start with raw SNP ids. Here such data 
 # comes with the data-package provided
 
@@ -177,8 +183,8 @@ res1$set_rsquared()</code></pre>
 ldabase &lt;- LDABase$new(file_path = &quot;/home/SSD-Data/1000Genomes/&quot;)
 
 # This sets up an object specifying the analysis interval and which populations are to be analyzed
-res2 &lt;- llply(analysis_intervals_gr[1:3], function(x){
-  dat &lt;- LDAImport$new(ldabase = ldabase, granges =  x, populations = c(&quot;CEU&quot;,&quot;CHB&quot;,&quot;JPT&quot;))$set_data()
+res2 &lt;- llply(analysis_intervals_gr, function(x){
+  dat &lt;- LDAImport$new(ldabase = ldabase, granges =  x, populations = populations)$set_data()
   res &lt;- LDAanalysis1$new(lead_snps = lead_snps, cutoff = 0.8, lda_import = dat)
   res$set_rsquared()
   res$set_results()
@@ -199,16 +205,88 @@ print(analysis_intervals_gr)
 ## WARNING: this should better not be executed on a desktop PC unless you have enough memory.
 registerDoMC(cores = 14)
 # This sets up an object specifying the analysis interval and which populations are to be analyzed
-res_complete &lt;- llply(analysis_intervals_gr[1:2], function(x){
+res_analysis1 &lt;- llply(analysis_intervals_gr, function(x){
   dat &lt;- LDAImport$new(ldabase = ldabase, granges =  x, populations = populations)$set_data()
   res &lt;- LDAanalysis1$new(lead_snps = lead_snps, cutoff = 0.8, lda_import = dat)
   res$set_rsquared()
   res$set_results()
   invisible(res)
-}, .parallel = T)
+}, .parallel = F)
 # 
-names(res_complete) &lt;- with(analysis_intervals_gr, paste(seqnames,start,end,sep = &quot;:&quot;))
-high_ld_complete &lt;- Reduce(c,Map(function(x) x$results, res_complete))</code></pre>
+names(res_analysis1) &lt;- with(analysis_intervals_gr, paste(seqnames,start,end,sep = &quot;:&quot;))
+high_ld_analysis1 &lt;- Reduce(c,Map(function(x) x$results, res_analysis1))
+save(res_analysis1, high_ld_analysis1, file=&quot;data/res_analysis1.RData&quot;)</code></pre>
+<p>Now that we have the tag-SNP interval, we just have to overlap them with p63 BS positions.</p>
+<pre class="r"><code>data(&quot;res_analysis1&quot;)
+
+p63_tagSNP_ol &lt;- findOverlaps(p63BS, high_ld_analysis1)
+p63ol &lt;- p63BS[queryHits(p63_tagSNP_ol)]
+tagsnpol &lt;- high_ld_analysis1[subjectHits(p63_tagSNP_ol)]
+mcols(p63ol) &lt;- data.frame(p63ID=mcols(p63ol),as.data.frame(tagsnpol))
+p63oltagsnp &lt;- p63ol
+save(p63oltagsnp, file=&quot;data/p63_ol_tagSNP_a1.RData&quot;)
+
+
+data(p63_ol_tagSNP_a1)</code></pre>
+</div>
+<div id="analysis-2-target-genes" class="section level4">
+<h4>Analysis 2, target genes</h4>
+<pre class="r"><code>library(ChIPpeakAnno)
+library(biomaRt)
+data(TSS.human.GRCh37)
+promoters(TSS.human.GRCh37)
+library(EnsDb.Hsapiens.v75)
+
+
+promoters2200 &lt;- promoters(TSS.human.GRCh37)
+mapping &lt;- mapIds(org.Hs.eg.db, keys = names(promoters2200),column = &quot;SYMBOL&quot;, keytype = &quot;ENSEMBL&quot;, multiVals = 'first')
+elementMetadata(promoters2200) &lt;- data.frame(elementMetadata(promoters2200), mapping)
+promoters2200
+
+
+## load interesting genes and find corresponding promoter regions
+ig &lt;- read.table(&quot;/home/SSD-Data/Projects/thesis/section_appendix/tables/interestinggenes.csv&quot;, header = F, stringsAsFactors = F)$V1
+ig &lt;- Reduce(c,strsplit(ig,&quot;/&quot;))
+ig_promoters &lt;- promoters2200[promoters2200$mapping %in% ig]
+
+## remove chromosomes that cannot be analysed using 1000G data
+ig_prom_pruned &lt;- keepStandardChromosomes(ig_promoters,pruning.mode = 'coarse')
+
+## create 650kb size analysis windows around promoters
+promoter650k &lt;-  reduce(resize(ig_prom_pruned,width = 650000,fix = 'center'))
+
+## finding snps in promoters
+library(SNPlocs.Hsapiens.dbSNP144.GRCh37)
+genome(ig_prom_pruned) &lt;- &quot;GRCh37.p13&quot;
+
+
+snp_in_promoters &lt;- snpsByOverlaps(SNPlocs.Hsapiens.dbSNP144.GRCh37, ig_prom_pruned)
+snps_a2 &lt;- snp_in_promoters$RefSNP_id
+analysis_intervals_a2 &lt;- promoter650k
+analysis_intervals_a2
+
+save(snps_a2, ig_prom_pruned, analysis_intervals_a2, populations, file = &quot;data/analysis2.RData&quot;)</code></pre>
+</div>
+<div id="analysis-2-workflow" class="section level4">
+<h4>Analysis 2 workflow</h4>
+<pre class="r"><code>data('analysis2')
+registerDoMC(cores = 14)
+ldabase &lt;- LDABase$new(file_path = &quot;/scratch/jfalck/1000G/&quot;)
+res_analysis2 &lt;- llply(analysis_intervals_a2, function(x){
+  dat &lt;- LDAImport$new(ldabase = ldabase, granges =  x, populations = populations)$set_data()
+  res &lt;- LDAanalysis1$new(lead_snps = snps_a2, cutoff = 0.8, lda_import = dat)
+  res$set_rsquared()
+  res$set_results()
+  invisible(res)
+}, .parallel = F)
+
+high_ld_analysis2 &lt;- Reduce(c,Map(function(x) x$results, res_analysis2))
+
+high_ld_analysis2 &lt;- Reduce(c,high_ld_analysis2)
+
+
+seqlevelsStyle(ig_prom_pruned) &lt;- &quot;UCSC&quot;
+subsetByOverlaps(ig_prom_pruned, high_ld_analysis2)</code></pre>
 </div>
 
 

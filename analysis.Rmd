@@ -110,11 +110,11 @@ res_analysis1 <- llply(analysis_intervals_gr, function(x){
 }, .parallel = F)
 # 
 names(res_analysis1) <- with(analysis_intervals_gr, paste(seqnames,start,end,sep = ":"))
-high_ld_analysis1 <- Reduce(c,Map(function(x) x$results, res_complete))
+high_ld_analysis1 <- Reduce(c,Map(function(x) x$results, res_analysis1))
 save(res_analysis1, high_ld_analysis1, file="data/res_analysis1.RData")
 ```
 Now that we have the tag-SNP interval, we just have to overlap them with p63 BS positions.
-```{r}
+```{r eval=FALSE, include=TRUE}
 data("res_analysis1")
 
 p63_tagSNP_ol <- findOverlaps(p63BS, high_ld_analysis1)
@@ -130,7 +130,7 @@ data(p63_ol_tagSNP_a1)
 
 #### Analysis 2, target genes
 
-```{r}
+```{r eval=FALSE, include=TRUE}
 library(ChIPpeakAnno)
 library(biomaRt)
 data(TSS.human.GRCh37)
@@ -163,13 +163,14 @@ genome(ig_prom_pruned) <- "GRCh37.p13"
 snp_in_promoters <- snpsByOverlaps(SNPlocs.Hsapiens.dbSNP144.GRCh37, ig_prom_pruned)
 snps_a2 <- snp_in_promoters$RefSNP_id
 analysis_intervals_a2 <- promoter650k
-populations
+analysis_intervals_a2
+
 save(snps_a2, ig_prom_pruned, analysis_intervals_a2, populations, file = "data/analysis2.RData")
 
 
 ```
 #### Analysis 2 workflow
-```{r }
+```{r eval=FALSE, include=TRUE}
 data('analysis2')
 registerDoMC(cores = 14)
 ldabase <- LDABase$new(file_path = "/scratch/jfalck/1000G/")
@@ -181,10 +182,13 @@ res_analysis2 <- llply(analysis_intervals_a2, function(x){
   invisible(res)
 }, .parallel = F)
 
-data('res_analysis2')
+high_ld_analysis2 <- Reduce(c,Map(function(x) x$results, res_analysis2))
+
 high_ld_analysis2 <- Reduce(c,high_ld_analysis2)
-seqlevelsStyle(promoters2200) <- "UCSC"
-subsetByOverlaps(promoters2200, high_ld_analysis2)
+
+
+seqlevelsStyle(ig_prom_pruned) <- "UCSC"
+subsetByOverlaps(ig_prom_pruned, high_ld_analysis2)
 
 
 ```
