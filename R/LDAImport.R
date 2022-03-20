@@ -1,3 +1,14 @@
+#' Object to import and hold 1000genomes vcf data and to specify populations to be analysed
+#'
+#' @param ldabase
+#' @param granges
+#' @param populations
+#'
+#' @return
+#' @export
+#'
+#' @examples
+
 require(R6, quietly = T, warn.conflicts = FALSE)
 LDAImport <- R6Class("LDAImport",
                      public = list(
