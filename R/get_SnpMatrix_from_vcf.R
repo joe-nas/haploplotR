@@ -6,8 +6,6 @@
 #' @param panel_file local file or url to panel file.
 #' @return Object of class SnpMatrix.
 #' @examples
-#' COMPLETE EXAMPLES
-
 
 get_SnpMatrix_from_vcf <- function(where, which = "CEU", vcf_file, panel_file){
   # capture.output({
