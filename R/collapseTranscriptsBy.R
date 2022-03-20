@@ -1,3 +1,12 @@
+#' Title
+#'
+#' @param txs GenomicRanges transcripts to be collapsed
+#' @param by collapsed by GenomicRanges column
+#'
+#' @return returns a list of collapsed GenomicRanges transcripts
+#' @export
+#'
+#' @examples
 collapseTranscriptsBy <- function(txs, by){
   txs <- GenomicRanges::as.data.frame(txs)
   txs$symbol <- select(Homo.sapiens::Homo.sapiens, keys = as.character(txs$tx_name),
