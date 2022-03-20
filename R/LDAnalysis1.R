@@ -1,3 +1,13 @@
+#' R6 object to hold and calculate linkage disequilibrium on lead snps using a rsqueared cutoff
+#' @param lda_import
+#' @param lead_snps vector containing dbsnp identifuer
+#' @param cutoff set rsquared cutoff. Defaults to 0.8.
+#' @param rsquared holding rsquared data after calculating it using self$set_rsquared
+#' @param results holding the results after using self$set_results
+#' @return R6 object to hold and calculate linkage disequilibrium on lead snps using a rsqueared cutoff
+#' @export
+#'
+#' @examples
 require(R6, quietly = T, warn.conflicts = FALSE)
 LDAanalysis1 <- R6Class("LDAanalysis1",
                         public = list(
