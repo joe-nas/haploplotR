@@ -1,3 +1,16 @@
+#' Object for holding and file needed for the calculation of linkage disequilibrium
+#'
+#' @param lead_snps vector contain dbsnpids
+#' @param populations vecotr containing 1000genomes population abbreviations
+#' @param file_path working directory
+#' @param vcf_file vcf filename
+#' @param panel_file panel filename
+#'
+#' @return
+#' @export
+#'
+#' @examples
+
 require(R6, quietly = T, warn.conflicts = FALSE)
 LDABase <- R6Class("LDABase",
                    public = list(
