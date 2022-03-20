@@ -8,11 +8,15 @@ library(Homo.sapiens)
 library(doMC)
 library(plyr)
 
+
 if(Sys.getenv("LOGNAME") == "jfalck"){
+  # in univerity
   devtools::load_all("/scratch/jfalck/git/haploplotR")
   vcffile<-"/scratch/jfalck/1000G/ALL.%s.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz"
   panelfile<-"/scratch/jfalck/1000G/integrated_call_samples_v3.20130502.ALL.panel"
   registerDoMC(cores=10)
+
+  # specifying lead snp identifier
   lead_snps<-c("rs79997038","rs79084855","rs560426","rs66515264","rs751399","rs10498466","rs12569773","rs4615961","rs10983654",
                "rs1512262","rs11119348","rs12566152","rs2865509","rs11698025","rs59138205","rs59626211","rs227727","rs227731",
                "rs9904526","rs9891446","rs112924906","rs643310","rs28474857","rs10886036","rs1898349","rs7017665","rs13266917",
@@ -24,10 +28,11 @@ if(Sys.getenv("LOGNAME") == "jfalck"){
                "rs13041247","rs742071","rs7632427","rs12543318","rs8001641","rs1873147","rs8076457","rs4441471","rs1373453",
                "rs7846606","rs7820074","rs4132699","rs13542","rs813218","rs3815854","rs4703516","rs7950069","rs5765956",
                "rs1536895")[c(8:11,28)]
-
+ #spicifying popuklations to be analysed in
   populations<-c("ACB","ASW","ESN","GWD","LWK","MSL","YRI","CLM","MXL","PEL","PUR","CDX","CHB","CHS","JPT","KHV","CEU",
                  "FIN","GBR","IBS","TSI","BEB", "GIH","ITU","PJL","STU")
 }else{
+  # at home
   devtools::load_all("/home/SSD-Data/Projects/haploplotR")
   vcffile<-"/home/SSD-Data/1000Genomes/ALL.%s.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz"
   panelfile<-"integrated_call_samples_v3.20130502.ALL.panel"
@@ -50,70 +55,6 @@ if(Sys.getenv("LOGNAME") == "jfalck"){
 
 }
 
-# LDABase <- R6Class("LDABase",
-#                    public = list(
-#                      lead_snps = NULL,
-#                      populations = NULL,
-#                      vcf_file = NULL,
-#                      panel_file = NULL,
-#                      file_path = NULL,
-#                      initialize = function(lead_snps = NA, populations = NA, file_path = ".",
-#                                            vcf_file = "ALL.%s.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz",
-#                                            panel_file = "integrated_call_samples_v3.20130502.ALL.panel"){
-#                        self$lead_snps <- lead_snps
-#                        self$populations <- populations
-#                        self$panel_file <- file.path(file_path,panel_file)
-#                        self$vcf_file <- file.path(file_path, vcf_file)
-#                        self$file_path <- file_path
-#                      }
-#                    ))
-#
-#
-# LDAImport <- R6Class("LDAImport",
-#   public = list(
-#     ldabase = NULL,
-#     granges = NULL,
-#     populations = NULL,
-#     data = NULL,
-#     initialize = function(ldabase = LDABase$new(), granges = GRanges(), populations = NA){
-#       self$ldabase <- ldabase
-#       self$granges <- granges
-#       self$populations <- populations
-#     },set_data = function(){
-#       self$data <- import1000GData(where = self$granges, which = self$populations, vcf_file = self$ldabase$vcf_file,
-#                                            panel_file = self$ldabase$panel_file)
-#       invisible(self$data)
-#     }
-#   )
-# )
-#
-# LDAanalysis1 <- R6Class("LDAanalysis1",
-#                         public = list(
-#                           lda_import = NULL,
-#                           lead_snps = NULL,
-#                           cutoff = NULL,
-#                           rsquared = NULL,
-#                           results = NULL,
-#                           initialize = function(lead_snps = NA, cutoff = 0.8, lda_import = NA){
-#                             self$lda_import <- lda_import
-#                             self$lead_snps <- lead_snps
-#                             self$cutoff <- cutoff
-#                           },
-#                           set_rsquared = function(){
-#                             cat(paste0("Calculating R squared.\n"))
-#                             self$rsquared <- Filter(function(x) {!is.null(x)}, llply(self$lda_import, function(x){
-#                               calculateLD(lead_snps = lead_snps, xSnpMatrix = x$genotype)
-#                             }))
-#                             invisible(self$rsquared)
-#                           },
-#                           set_results = function(){
-#                             cat(paste0("Finding HighLD intervals.\n"))
-#                             self$results <- Reduce(c, llply(names(self$rsquared), function(y){
-#                               identifyHighLD(rsquared = self$rsquared[[y]], info = self$lda_import[[y]]$info, cutoff = self$cutoff,
-#                                              population = y)}))
-#                             invisible(self$results)
-#                           }
-#                         ))
 
 
 lead_snps_gr<-GRanges(snpsById(SNPlocs.Hsapiens.dbSNP144.GRCh37,lead_snps))
@@ -146,6 +87,7 @@ results <- llply(analysis_intervals_gr,function(x){
   ldaanalysis1$results
   invisible(ldaanalysis1)
 },.parallel = T)
+
 names(results) <- paste(paste(analysis_intervals_gr))
 
 ## debug
