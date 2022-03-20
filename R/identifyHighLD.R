@@ -1,3 +1,15 @@
+#' Function to identify
+#'
+#' @param rsquared from snpmatrix
+#' @param info snpmatrix
+#' @param cutoff rsqared cutoff defaults to 0.8
+#' @param population Target population(s). Something like "CEU" or c("CEU", "CHB").
+#' @param gr_str
+#'
+#' @return GRanges object containing lead_snp, tag_snp, rsquared_value, population, tag_snp_pos, gr_str
+#' @export
+#'
+#' @examples
 identifyHighLD <- function(rsquared, info, cutoff = 0.8, population = NULL, gr_str = NA){
   # index in rsquared
   highld_idx <- which(rsquared >= cutoff, arr.ind = T)
