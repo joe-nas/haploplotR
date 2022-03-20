@@ -1,3 +1,11 @@
+#' prepares gene models for visualization given a GRanges as input
+#'
+#' @param where GRanges object
+#'
+#' @return list of Granges containg gene models
+#' @export
+#'
+#' @examples
 prepareGenes <- function(where){
   df <- GenomicRanges::as.data.frame(GenomicRanges::sort(biovizBase::crunch(TxDb.Hsapiens.UCSC.hg19.knownGene,where)))
   df$SYMBOL <- select(Homo.sapiens, keys = as.character(df$gene_id), keytype = "GENEID",
