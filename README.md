@@ -24,6 +24,9 @@ finally a vector containing lead-snps c("rs79997038","rs79084855","rs560426","rs
 Lead-snps are the snps you start calculation pairwise linkage disequilibrium from. 
 
 ## To do:
+- write a decent how to!
 - tidy up remove: 
   - analysis.R
+  - liloanalysis.R
+  - testscript.R
 
