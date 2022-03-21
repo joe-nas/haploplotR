@@ -1,6 +1,7 @@
 # haploplotR:  Project to visualize linkage disequilibrium from 1000 genomes data
 
 ![rs2235371](https://user-images.githubusercontent.com/4353093/159236477-4170a802-f476-4a18-bb08-a036a98b7ada.png)
+
 Example plot using the IRF6 locus. Red bars in the population panels represent tag snps, 
 snps wich are in linkage disequilibrium (rsquared >= .8) with lead snps indicated by blue bars.
 The p63BS panel indicates p63 binding sites which overlap with lead or tag snps (red) in at least one population 
