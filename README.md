@@ -10,3 +10,5 @@ Generally speaking you define a GRanges object describing the region of interest
 1000genomes populations you are interested in eg. c("CEU", "HAN", "ACB") and 
 finally a vector containing lead-snps c("rs79997038","rs79084855","rs560426","rs66515264").
 Lead-snps are the snps you start calculation pairwise linkage disequilibrium from. 
+
+![IRF6](https://user-images.githubusercontent.com/4353093/159236097-d6d0b934-9b74-49c0-b371-add85f8b6ead.png)
