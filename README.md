@@ -12,8 +12,8 @@ Given that gwas only indicates a genomic region, further study of that region ne
 and bringing it into context with p63, a tf regulating facial development one might find regulatory regions like enhancers being involved in NSCL/P.
 
 ## requirements:
-- 1000 genomes vcf files
-- 1000 genomes panel file
+- 1000 genomes vcf files can be found here: http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/
+- 1000 genomes panel file is availabkle here: http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/integrated_call_samples_v3.20130502.ALL.panel
 - lead_snps: vector of dbsnp identifiers e.g. c("rs79997038","rs79084855","rs560426","rs66515264")
 - population: vector of population identifiers as in panel file e.g. c("CEU", "HAN", "ACB")
 
