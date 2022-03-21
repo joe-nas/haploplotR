@@ -7,9 +7,9 @@ snps wich are in linkage disequilibrium (rsquared >= .8) with lead snps indicate
 The p63BS panel indicates p63 binding sites which overlap with lead or tag snps (red) in at least one population 
 and therefore are at least in part in linkage disequilibrium with the lead snp. Or as indicated by black bars are not in linkage disequilibrium.
 
-For this particular locus lead snps are snps indicated by gwas focusing on non syndromic cleft lip witg or without cleft palate. 
-Given that gwas only indicates a genomic region further study of that region needs to be done. By analysing linkage disequilibrium in that region
-and bringing it in context with p63 a tf regulating facial development one might find regulatory regions like enhancer being involved in NSCL/P.
+For this particular locus lead snps are snps indicated by gwas focusing on non syndromic cleft lip with or without cleft palate (NSCL/P). 
+Given that gwas only indicates a genomic region, further study of that region needs to be done. By analysing linkage disequilibrium in that region
+and bringing it into context with p63, a tf regulating facial development one might find regulatory regions like enhancers being involved in NSCL/P.
 
 ## requirements:
 - 1000 genomes vcf files
