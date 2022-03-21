@@ -29,4 +29,5 @@ Lead-snps are the snps you start calculation pairwise linkage disequilibrium fro
   - analysis.R
   - liloanalysis.R
   - testscript.R
+  - LDAnalysis_class.R
 
