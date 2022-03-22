@@ -20,12 +20,15 @@ import1000GData <- function(where, which, vcf_file, panel_file, ...){
   end_pos <- end(where)
 
   gr_str <- paste(chromosome_str, start_pos, end_pos, sep = ":")
+
+  ##WHopGenome needs to be replaced with VariantAnnotation package
   res <- llply(panel_file_pops, function(x){
     vcf_handle <- with(where, WhopGenome::vcf_open(sprintf(vcf_file, chromosome_str)))
     WhopGenome::vcf_setregion(vcffh = vcf_handle, chromosome_num, start_pos, end_pos)
 
 
     which <- x$sample
+
 
     WhopGenome::vcf_selectsamples(vcf_handle, which)
 
