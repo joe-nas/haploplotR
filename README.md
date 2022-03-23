@@ -42,7 +42,7 @@ lead_snps<-c("rs79997038","rs79084855","rs560426")
 populations <- c("CEU",'CHB',"LWK")
 ```
 
-in order to analyse linkage disequilibrium only in a window around our lead_snp we need to define a window around lead_snps.
+In order to analyse linkage disequilibrium only in a window around our lead_snp we need to define a window around lead_snps. 
 Here we take the lead_snps identifiers and create a GRanges object from it and subsequently resize the genomic position to a window.
 For compatibility reason we set the seqlevelsStyle to "UCSC"
 ```r
@@ -52,13 +52,24 @@ seqlevelsStyle(lead_snps_gr)<-"UCSC"
 seqlevelsStyle(analysis_intervals_gr)<-"UCSC"
 ```
 
-Next we put our ingredients into the LDABase, LDAImport and LDAnalysis1 objects and do the actual analysis on it.
-Here for each of the analysis intervals and populations which are defined prior we import our data using the LDAImport object and by applying the $new method. Subsequently, LDAnalysis1$new is called. Here, we input the vector of lead_snps, define an rsquared cutoff which defaults to .8 and use our data as imported by LDAImport.
-We generate results using the LDAnlaysis1$set_rsquared() and set_results() methods to calculate and filter which SNPs in the analysis windows are in linkage disequilibrium with the lead snps as defined by the cutoff value.
+Next we put our ingredients into the LDABase, LDAImport and LDAnalysis1 objects.
+Here for each of the analysis intervals and populations which are defined prior we import our data using the LDAImport object and by applying the $new() method. 
+Subsequently, LDAnalysis1$new() is called. 
+Here, we input the vector of lead_snps, define an rsquared cutoff which defaults to .8 and use our data as imported by LDAImport.
+We generate results using the LDAnlaysis1$set_rsquared() and set_results() methods to calculate and filter which SNPs in the analysis windows are in linkage disequilibrium with the lead_snps. by meeting the cutoff value.
 Here the set_rsquared() method calculates all rsquared values for lead snps with all other snps in the analysis window.
 set_results() filters the rsquared data to meet the cutoff value.
 ```r
-ldabase <- LDABase$new() 
+
+ldabase <- LDABase$new()
+# workflow for only one interval/ single locus
+dat <- LDAImport$new(ldabase = ldabase, granges = analysis_intervals_gr[1], populations = populations)$set_data()
+res <- LDAnalysis1$new(lead_snps = lead_snps, cutoff = 0.8, lda_import = dat)
+res$set_rsquared()
+res$set_results()
+
+
+# workflow for multiple analysis intervals
 results <- llply(analysis_intervals_gr, function(x){
     dat <- LDAImport$new(ldabase = ldabase, granges =  x, populations = populations)$set_data()
     res <- LDAnalysis1$new(lead_snps = lead_snps, cutoff = 0.8, lda_import = dat)
@@ -66,7 +77,6 @@ results <- llply(analysis_intervals_gr, function(x){
     res$set_results()
     invisible(res)
 }, .parallel = F, .inform = F, .progress = "text")
-
 
 ```
 
