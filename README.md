@@ -19,23 +19,39 @@ and bringing it into context with p63, a tf regulating facial development one mi
 
 ## How to:
 
-
+First a few dependencies and useful objects need to be loaded
 ```r {cmd}
-#load dependencies
+#loading dependencies
 library(devtools)
 library(GenomicRanges)
 library(grid)
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 library(Homo.sapiens)
-
 devtools::load_all("path_to/haploplotR")
-
 ```
 
-'''r
- vcffile<-".path_to/ALL.%s.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz"
+Next we specify 1000genomes vcf files and panel file paths. Furthermore target snps and populations are defined.
+```r
+# specify 1000genomes vcf files and panel file paths
+vcffile<-"path_to/ALL.%s.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz"
+panelfile<-"path_to/integrated_call_samples_v3.20130502.ALL.panel"
  
-'''
+# create vectors defining lead_snps as well as 1000genomes population identifiers
+
+lead_snps<-c("rs79997038","rs79084855","rs560426")
+populations <- c("CEU",'CHB',"LWK")
+```
+in order to analyse linkage disequilibrium only in a window around our lead_snp we need to define a window around lead_snps.
+Here we take the lead_snps identifiers and create a GRanges object from it and subsequently resize the genomic position to a window.
+For compatibility reason we set the seqlevelsStyle to "UCSC"
+```r
+
+lead_snps_gr<-GRanges(snpsById(SNPlocs.Hsapiens.dbSNP144.GRCh37,lead_snps))
+analysis_intervals_gr<-resize(lead_snps_gr,fix='center',width=6.5e5)
+seqlevelsStyle(lead_snps_gr)<-"UCSC"
+seqlevelsStyle(analysis_intervals_gr)<-"UCSC"
+
+```
 
 
 Generally speaking you define a GRanges object describing the region of interest, 
