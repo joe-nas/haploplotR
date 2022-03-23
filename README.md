@@ -41,6 +41,7 @@ finally a vector containing lead-snps c("rs79997038","rs79084855","rs560426","rs
 Lead-snps are the snps you start calculation pairwise linkage disequilibrium from. 
 
 ## To do:
+- import1000GData.R needs a rewrite using VariantAnnotation as WhopGenome is no longer maintained
 - write a decent howto
 - tidy up roxygen
 - tidy up remove: 
