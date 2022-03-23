@@ -28,11 +28,14 @@ library(grid)
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 library(Homo.sapiens)
 
-devtools::load_all(".path_to/haploplotR")
+devtools::load_all("path_to/haploplotR")
 
 ```
 
-
+'''r
+ vcffile<-".path_to/ALL.%s.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz"
+ 
+'''
 
 
 Generally speaking you define a GRanges object describing the region of interest, 
