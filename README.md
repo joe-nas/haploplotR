@@ -63,28 +63,26 @@ set_results() filters the rsquared data to meet the cutoff value.
 
 ldabase <- LDABase$new()
 # workflow for only one interval/ single locus
-dat <- LDAImport$new(ldabase = ldabase, granges = analysis_intervals_gr[1], populations = populations)$set_data()
+dat <- LDAImport$new(ldabase = ldabase, granges = analysis_intervals_gr[1], 
+                     populations = populations)$set_data()
 res <- LDAnalysis1$new(lead_snps = lead_snps, cutoff = 0.8, lda_import = dat)
 res$set_rsquared()
 res$set_results()
-
-
-# workflow for multiple analysis intervals
-results <- llply(analysis_intervals_gr, function(x){
-    dat <- LDAImport$new(ldabase = ldabase, granges =  x, populations = populations)$set_data()
-    res <- LDAnalysis1$new(lead_snps = lead_snps, cutoff = 0.8, lda_import = dat)
-    res$set_rsquared()
-    res$set_results()
-    invisible(res)
-}, .parallel = F, .inform = F, .progress = "text")
-
 ```
+
+The results can then be accessed by using res$results. res$results holds a Granges object containing the positions of  tag_snps annotated with:
+
+- lead_snp_name
+- tag_snp_name
+- rsquared
+- population
+- lead_snp_pos
 
 
 
 ## To do:
 - import1000GData.R needs a rewrite using VariantAnnotation as WhopGenome is no longer maintained
-- write a decent howto
+- write a decent howto, how to visualize
 - tidy up roxygen
 - tidy up remove: 
   - obsolete/analysis.R
