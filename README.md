@@ -82,7 +82,7 @@ The results can then be accessed by using res$results. res$results holds a Grang
 
 ## To do:
 - import1000GData.R needs a rewrite using VariantAnnotation as WhopGenome is no longer maintained
-- write a decent howto, how to visualize
+- write a decent how to, how to visualize
 - tidy up roxygen
 - tidy up remove: 
   - obsolete/analysis.R
