@@ -1,2 +1,3 @@
+#
 useDynLib(haploplotR)
 importFrom(Rcpp, sourceCpp)
